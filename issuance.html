@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DHSUD VI | ELUPDD - CLUP/ZO Knowledge Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* ===== BASE STYLES (from indexGUI.html) ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", "Segoe UI", Roboto, sans-serif; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 1.5rem 1.5rem 2rem;
+      background: #f4f7fc;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(26, 115, 232, 0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, rgba(0, 200, 150, 0.06) 0%, transparent 60%),
+                  linear-gradient(145deg, #f0f4f8 0%, #e8edf3 100%);
+      z-index: 0;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(25px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+      0% { opacity: 0; transform: translateX(-40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      0% { opacity: 0; transform: translateX(40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+    .animate-fadeUp { animation: fadeUp 0.7s ease forwards; }
+    .animate-slideLeft { animation: slideInLeft 0.6s ease forwards; }
+    .animate-slideRight { animation: slideInRight 0.6s ease forwards; }
+
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== HEADER / NAVIGATION (from indexGUI.html) ===== */
+    .app-header {
+      width: 100%;
+      max-width: 1280px;
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: white;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      position: relative;
+      z-index: 5;
+    }
+    .app-header .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .app-header .brand img {
+      height: 42px;
+      width: auto;
+      display: block;
+      border-radius: 8px;
+    }
+    .app-header .brand span {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #1e3a8a;
+      letter-spacing: -0.3px;
+    }
+    .app-header .brand small {
+      font-weight: 400;
+      font-size: 0.6rem;
+      color: #64748b;
+      display: block;
+      margin-top: -2px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Navigation links - center */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      flex: 1;
+      justify-content: center;
+    }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-decoration: none;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .nav-links a i { font-size: 0.8rem; }
+    .nav-links a:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .nav-links a.active {
+      background: #1e3a8a;
+      color: white;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+    .nav-links a.active:hover {
+      background: #2563eb;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropbtn {
+      background: none;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+    .dropbtn:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: white;
+      min-width: 210px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      z-index: 1000;
+      top: 36px;
+      left: 0;
+      border: 1px solid #eef2ff;
+      padding: 0.3rem 0;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 0.6rem 1.2rem;
+      color: #1e293b;
+      font-size: 0.75rem;
+      text-decoration: none;
+      border: none;
+      background: none;
+      border-radius: 0;
+    }
+    .dropdown-content a:hover {
+      background: #eff6ff;
+    }
+    .dropdown-submenu {
+      position: relative;
+    }
+    .submenu-trigger {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: inherit;
+    }
+    .submenu-trigger:hover { background: #eff6ff; }
+    .arrow-right { font-size: 0.7rem; margin-left: 1rem; }
+    .submenu-content {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: white;
+      min-width: 170px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      border: 1px solid #eef2ff;
+      z-index: 1001;
+      padding: 0.3rem 0;
+    }
+    .dropdown-submenu:hover .submenu-content {
+      display: block;
+    }
+    .submenu-content a { padding: 0.6rem 1.2rem; }
+    .dropbtn::after {
+      content: " ▾";
+      font-size: 0.6rem;
+      opacity: 0.6;
+    }
+    .dropdown:hover .dropbtn::after {
+      opacity: 1;
+    }
+
+    /* User menu - right side */
+    .user-menu-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.15rem 0.5rem 0.15rem 0.7rem;
+      border-radius: 60px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .user-menu:hover { background: #e2e8f0; }
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      background: #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .user-name {
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    .role-badge-header {
+      background: #e2e8f0;
+      padding: 0.1rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.55rem;
+      font-weight: 600;
+    }
+    .role-badge-header.admin { background: #dcfce7; color: #166534; }
+    .role-badge-header.staff { background: #dbeafe; color: #1e40af; }
+    .user-dropdown-menu {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: white;
+      border-radius: 20px;
+      min-width: 180px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+      border: 1px solid #eef2ff;
+      overflow: hidden;
+      display: none;
+      z-index: 200;
+    }
+    .user-dropdown-item {
+      padding: 0.7rem 1.2rem;
+      border-bottom: 1px solid #f1f5f9;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .user-dropdown-item:hover { background: #f8fafc; }
+    .login-prompt {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.2rem 0.8rem 0.2rem 1rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #1e3a8a;
+    }
+    .login-prompt:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* ===== TOAST NOTIFICATIONS (from indexGUI.html) ===== */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      width: 100%;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transform: translateX(120%);
+      animation: slideIn 0.5s ease forwards;
+      border-left: 5px solid #2563eb;
+      min-height: 60px;
+    }
+    .toast.hiding { animation: slideOut 0.4s ease forwards; }
+    .toast-success { border-left-color: #10b981; }
+    .toast-error { border-left-color: #ef4444; }
+    .toast-info { border-left-color: #2563eb; }
+    .toast-warning { border-left-color: #f59e0b; }
+
+    .toast-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .toast-success .toast-icon { background: #d1fae5; color: #059669; }
+    .toast-error .toast-icon { background: #fee2e2; color: #dc2626; }
+    .toast-info .toast-icon { background: #dbeafe; color: #2563eb; }
+    .toast-warning .toast-icon { background: #fef3c7; color: #d97706; }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 0.9rem; color: #0f172a; }
+    .toast-message { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+    .toast-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+    .toast-close:hover { color: #475569; }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(120%); opacity: 0; }
+    }
+
+    /* ===== HERO (from indexGUI.html) ===== */
+    .hero-innovations {
+      background: white;
+      border-radius: 28px;
+      margin: 0 0 2rem 0;
+      padding: 2.5rem 3rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .innov-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .innov-text { flex: 1.2; }
+    .innov-text h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0f2b3a, #1e4a76);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.8rem;
+    }
+    .innov-text p {
+      font-size: 0.95rem;
+      color: #2c4c6e;
+      margin-bottom: 1.5rem;
+      max-width: 90%;
+    }
+    .platform-badges {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .badge-pill {
+      background: #f1f5f9;
+      border-radius: 60px;
+      padding: 0.2rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .badge-pill:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+    }
+    .badge-pill i { margin-right: 4px; }
+    .innov-image { flex: 0.8; text-align: center; animation: float 4s ease-in-out infinite; }
+    .innov-image img {
+      max-width: 100%;
+      border-radius: 24px;
+      background: white;
+      padding: 0.6rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    /* ===== SECTION HEADER (from indexGUI.html) ===== */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+      border-left: 6px solid #2563eb;
+      padding-left: 1rem;
+    }
+    .section-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0f2b3a;
+    }
+    .section-header h2 i { color: #2563eb; margin-right: 8px; }
+
+    /* ===== CARD (from indexGUI.html) ===== */
+    .card {
+      background: white;
+      border-radius: 28px;
+      margin: 0 0 2rem 0;
+      padding: 2.5rem 3rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      max-width: 1280px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .card-header-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: white;
+      box-shadow: 0 8px 24px rgba(26, 115, 232, 0.3);
+    }
+    .card-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      letter-spacing: -0.5px;
+    }
+    .card-header h2 small {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: #64748b;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .card-header-badge {
+      background: rgba(0, 200, 150, 0.15);
+      border: 1px solid rgba(0, 200, 150, 0.2);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      color: #00c896;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-body {
+      padding: 0;
+    }
+
+    /* ===== SEARCH/FILTER BAR ===== */
+    .search-filter-bar {
+      background: #f8fafc;
+      border-radius: 24px;
+      padding: 0.8rem 1.2rem;
+      margin: 1rem 0 1.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      border: 1px solid #e2e8f0;
+    }
+    .search-input {
+      flex: 2;
+      min-width: 200px;
+      padding: 0.6rem 1rem;
+      border-radius: 40px;
+      border: 1.5px solid #cbd5e1;
+      font-family: "Inter", sans-serif;
+      font-size: 0.85rem;
+      transition: all 0.25s ease;
+      outline: none;
+      background: white;
+    }
+    .search-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .filter-select {
+      padding: 0.6rem 1rem;
+      border-radius: 40px;
+      border: 1.5px solid #cbd5e1;
+      background: white;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      transition: all 0.25s ease;
+      outline: none;
+      min-width: 180px;
+    }
+    .filter-select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .clear-btn {
+      background: #f1f5f9;
+      border: none;
+      border-radius: 40px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .clear-btn:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+    }
+
+    /* ===== TABS ===== */
+    .tabs-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.25rem;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 40px 40px 12px 12px;
+      transition: all 0.2s;
+      color: #475569;
+      font-family: "Inter", sans-serif;
+    }
+    .tab-btn.active {
+      background: #1e3a8a;
+      color: white;
+      box-shadow: 0 -2px 0 #1e3a8a;
+    }
+    .tab-btn:hover:not(.active) {
+      background: #f1f5f9;
+    }
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== DOCUMENT GRID ===== */
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .doc-card {
+      background: white;
+      border-radius: 1.5rem;
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .doc-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.1);
+      border-color: #2563eb;
+    }
+    .doc-header {
+      background: #f8fafc;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid #eef2ff;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .doc-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .doc-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+    .doc-meta {
+      padding: 0.7rem 1.2rem;
+      background: white;
+      font-size: 0.7rem;
+      color: #475569;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .doc-category {
+      background: #eef2ff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      color: #1e40af;
+      font-weight: 600;
+      font-size: 0.65rem;
+    }
+    .doc-desc {
+      padding: 1rem 1.2rem;
+      font-size: 0.8rem;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    .doc-footer {
+      padding: 0.8rem 1.2rem;
+      background: #fafcff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .btn-download {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    .btn-download:hover {
+      background: #1e3a8a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    .btn-view {
+      background: #f1f5f9;
+      color: #1e293b;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-view:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: white;
+      border-radius: 2rem;
+      color: #94a3b8;
+      border: 1px dashed #cbd5e1;
+    }
+    .empty-state i {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #cbd5e1;
+    }
+
+    /* ===== LOGIN MODAL (from indexGUI.html) ===== */
+    .login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .login-modal.active { display: flex; }
+    .login-modal-content {
+      background: white;
+      border-radius: 2.5rem;
+      max-width: 440px;
+      width: 92%;
+      overflow: hidden;
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.4);
+      animation: fadeUp 0.3s ease;
+    }
+    .login-modal-brand {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+    .login-modal-brand img {
+      width: 110px;
+      height: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      display: inline-block;
+      margin-bottom: 0.6rem;
+    }
+    .login-modal-brand h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.1rem; }
+    .login-modal-brand p { font-size: 0.7rem; opacity: 0.85; }
+    .login-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: 0.2s;
+    }
+    .login-modal-close:hover { opacity: 1; transform: scale(1.1); }
+    .login-modal-body { padding: 1.8rem 1.8rem 1.2rem; }
+    .login-modal-body .input-group { margin-bottom: 1rem; }
+    .login-modal-body .input-group label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #54708f;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.3px;
+    }
+    .login-modal-body .input-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .login-modal-body .input-group input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .login-submit-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 1.2rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .login-submit-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .login-submit-btn:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+    .login-modal-footer {
+      text-align: center;
+      font-size: 0.6rem;
+      color: #94a3b8;
+      padding: 0.4rem 0 1rem;
+      border-top: 1px solid #eef2ff;
+      margin: 0 1.8rem;
+    }
+
+    /* ===== FOOTER (from indexGUI.html) ===== */
+    .footer-new {
+      background: #0a2540;
+      color: #b9d0e7;
+      padding: 2rem 0;
+      margin-top: 3rem;
+      border-top: 1px solid #2d4f6e;
+      width: 100%;
+    }
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .social-icons i {
+      font-size: 1.6rem;
+      margin-right: 0.8rem;
+      color: white;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .social-icons i:hover {
+      transform: translateY(-4px);
+      color: #3b82f6;
+    }
+    .footer-new .logo-image {
+      height: 40px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      margin-bottom: 12px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .app-header { flex-wrap: wrap; gap: 0.5rem; padding: 0.6rem 1rem; }
+      .nav-links { flex: 1 1 100%; justify-content: center; order: 2; }
+      .user-menu-section { order: 3; justify-content: center; width: 100%; }
+      .brand { order: 1; }
+    }
+    @media (max-width: 800px) {
+      .app-header { flex-direction: column; align-items: stretch; padding: 0.6rem 1rem; }
+      .nav-links { flex-wrap: wrap; justify-content: center; order: 2; }
+      .user-menu-section { justify-content: center; margin-top: 0.3rem; order: 3; width: 100%; }
+      .brand { order: 1; justify-content: center; }
+      .hero-innovations { padding: 1.5rem; }
+      .innov-grid { flex-direction: column; }
+      .innov-text p { max-width: 100%; }
+      .innov-image { flex: 1; }
+      .card { padding: 1.5rem; border-radius: 2rem; }
+      .card-header { flex-direction: column; align-items: stretch; }
+      .doc-grid { grid-template-columns: 1fr; }
+      .search-filter-bar { flex-direction: column; align-items: stretch; }
+      .search-input { min-width: 100%; }
+      .filter-select { min-width: 100%; }
+      .tabs-container { flex-wrap: wrap; }
+      .tab-btn { font-size: 0.75rem; padding: 0.4rem 1rem; }
+      .brand span { font-size: 0.9rem; }
+      .brand img { height: 34px; }
+    }
+    @media (max-width: 500px) {
+      .container { padding: 0 12px; }
+      .hero-innovations { padding: 1rem; margin: 1rem 0; }
+      .innov-text h1 { font-size: 1.6rem; }
+      .card { padding: 1rem; margin: 1rem 0; }
+      .doc-grid { grid-template-columns: 1fr; }
+      .doc-card { border-radius: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== HEADER (from indexGUI.html) ===== -->
+<div class="app-header">
+  <div class="brand">
+    <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+    <div>
+      <span>DHSUD VI - ELUPDD</span>
+      <small>CLUP & ZO Integrated System</small>
+    </div>
+  </div>
+  <div class="nav-links" id="mainNavContainer">
+    <!-- Dynamically rendered -->
+  </div>
+  <div class="user-menu-section" id="userMenuContainer">
+    <!-- Dynamically rendered -->
+  </div>
+</div>
+
+<main>
+  <div class="container">
+    <!-- ===== HERO (from indexGUI.html) ===== -->
+    <div class="hero-innovations">
+      <div class="innov-grid">
+        <div class="innov-text">
+          <h1>CLUP / ZO Knowledge Hub</h1>
+          <p>Based on official issuances, development controls, templates, and legal frameworks — complete reference for Local Government Units in Western Visayas.</p>
+          <div class="platform-badges">
+            <span class="badge-pill"><i class="fas fa-file-alt"></i> Templates</span>
+            <span class="badge-pill"><i class="fas fa-book"></i> Guidelines</span>
+            <span class="badge-pill"><i class="fas fa-gavel"></i> Laws</span>
+            <span class="badge-pill"><i class="fas fa-industry"></i> Dev Controls</span>
+          </div>
+        </div>
+        <div class="innov-image">
+          <img src="img/ELUPDD.png" alt="ELUPDD Official Logo" onerror="this.style.display='none'" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MAIN CARD ===== -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-header-icon"><i class="fas fa-book"></i></div>
+          <div>
+            <h2>
+              CLUP / ZO Knowledge Hub
+              <small>Compilation of Guidelines & Issuances</small>
+            </h2>
+          </div>
+        </div>
+        <div class="card-header-badge">
+          <i class="fas fa-circle" style="font-size: 0.4rem; color: #00c896;"></i>
+          <span>Live</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- SEARCH/FILTER BAR -->
+        <div class="search-filter-bar">
+          <input type="text" id="globalSearch" class="search-input" placeholder="🔍 Search by title, legal basis, description...">
+          <select id="categoryFilter" class="filter-select">
+            <option value="all">📂 All Categories</option>
+            <option value="Template">📄 Templates / Forms</option>
+            <option value="Guideline">📘 Guidelines & Manuals</option>
+            <option value="Law">⚖️ Laws (RA, PD, EO)</option>
+            <option value="Memorandum">📋 Circulars / MC / JMC / Resolutions</option>
+            <option value="Development Control">🏭 Development Controls & Distance Reqts</option>
+          </select>
+          <button class="clear-btn" id="clearFiltersBtn"><i class="fas fa-times"></i> Clear Filters</button>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs-container">
+          <button class="tab-btn active" data-tab="templates"><i class="fas fa-file-alt"></i> Templates & Forms</button>
+          <button class="tab-btn" data-tab="guidelines"><i class="fas fa-book"></i> Guidelines & Man.</button>
+          <button class="tab-btn" data-tab="laws"><i class="fas fa-gavel"></i> Laws & Issuances</button>
+          <button class="tab-btn" data-tab="devcontrols"><i class="fas fa-industry"></i> Development Controls</button>
+        </div>
+
+        <!-- TAB PANES -->
+        <div id="templatesPane" class="tab-pane active"><div class="doc-grid" id="templatesGrid"></div></div>
+        <div id="guidelinesPane" class="tab-pane"><div class="doc-grid" id="guidelinesGrid"></div></div>
+        <div id="lawsPane" class="tab-pane"><div class="doc-grid" id="lawsGrid"></div></div>
+        <div id="devcontrolsPane" class="tab-pane"><div class="doc-grid" id="devcontrolsGrid"></div></div>
+        <div id="emptyMessage" class="empty-state" style="display: none;">
+          <i class="fas fa-search"></i>
+          <p>📭 No matching documents. Adjust filters or search.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== FOOTER (from indexGUI.html) ===== -->
+<footer class="footer-new">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img src="img/DHSUD_LOGO.png" alt="logo" class="logo-image" /><br />
+        <strong>DHSUD Region VI</strong><br />ELUPDD – CLUP & ZO Platform<br />Geospatial Innovation for Resilience
+      </div>
+      <div>
+        <strong>Our Social Networks</strong><br />Follow us for updates<br />
+        <div class="social-icons">
+          <a href="https://web.facebook.com/DHSUDR6" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook"></i></a>
+          <i class="fab fa-instagram"></i><i class="fab fa-twitter"></i>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2rem; border-top:1px solid #2d4f6e; padding-top:1rem">© 2026 DHSUD VI — ELUPDD</div>
+  </div>
+</footer>
+
+<!-- ===== LOGIN MODAL (from indexGUI.html) ===== -->
+<div id="loginModal" class="login-modal">
+  <div class="login-modal-content">
+    <div class="login-modal-brand">
+      <button class="login-modal-close" onclick="closeLoginModal()">&times;</button>
+      <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+      <h3>DHSUD Region VI</h3>
+      <p>ELUPDD · CLUP & ZO Platform</p>
+    </div>
+    <div class="login-modal-body">
+      <form id="modalLoginForm">
+        <div class="input-group">
+          <label><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" id="modalLoginEmail" placeholder="name@dhsud.gov.ph" required />
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="modalLoginPassword" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="login-submit-btn" id="loginModalBtn">→ Sign In</button>
+      </form>
+    </div>
+    <div class="login-modal-footer">🔐 Role-Based Access: Admin | Staff/Officer</div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// TOAST NOTIFICATION SYSTEM (from indexGUI.html)
+// ============================================
+function showToast(title, message, type = 'info', duration = 4000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  const icons = {
+    success: 'fa-check-circle',
+    error: 'fa-times-circle',
+    warning: 'fa-exclamation-triangle',
+    info: 'fa-info-circle'
+  };
+  
+  toast.innerHTML = `
+    <div class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+  `;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+  
+  return toast;
+}
+
+// ============================================
+// CONFIGURATION
+// ============================================
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCYiLHesLAvoh6wV_gTQyTGYBwRqiBwDpiKiLsYHOntGVF2gW5NjWUS50YzoHaJmk/exec";
+let currentUser = null;
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function escapeHtml(s) { if (!s) return ""; return String(s).replace(/[&<>]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;" })[m]); }
+function encodePassword(p) { return btoa(p); }
+
+// ============================================
+// SESSION MANAGEMENT (from indexGUI.html)
+// ============================================
+function checkSession() {
+  const raw = localStorage.getItem("dhsud_session");
+  if (raw) {
+    try {
+      const s = JSON.parse(raw);
+      const diff = (new Date() - new Date(s.loggedInAt)) / (1000 * 60 * 60);
+      if (diff < 12 && s.email) {
+        currentUser = s;
+        return true;
+      } else localStorage.removeItem("dhsud_session");
+    } catch(e) { localStorage.removeItem("dhsud_session"); }
+  }
+  currentUser = null;
+  return false;
+}
+
+function getUserInitials(n) { if (!n) return "U"; let p = n.split(" "); if (p.length >= 2) return (p[0][0] + p[1][0]).toUpperCase(); return n.substring(0,2).toUpperCase(); }
+function getRoleLabel(r) { if (r === "admin") return "👑 Admin"; if (r === "encoder" || r === "staff") return "📋 Staff/Officer"; return "👁️ Viewer"; }
+function getRoleClass(r) { if (r === "admin") return "admin"; if (r === "encoder" || r === "staff") return "staff"; return "viewer"; }
+
+// ============================================
+// RENDER NAVIGATION & USER MENU (from indexGUI.html)
+// ============================================
+function renderMainNavigation() {
+  const container = document.getElementById("mainNavContainer");
+  if (!container) return;
+  let navHtml = `<a href="index.html"><i class="fas fa-home"></i> Home</a>`;
+  if (currentUser) {
+    navHtml += `
+      <div class="dropdown">
+        <button class="dropbtn">Certification</button>
+        <div class="dropdown-content">
+          <a href="lc.html">Locational Clearance</a>
+          <a href="SZC.html">Site Zoning Certification</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn">Land Use Plans</button>
+        <div class="dropdown-content">
+          <div class="dropdown-submenu">
+            <button class="submenu-trigger">CLUP & ZO <span class="arrow-right">▸</span></button>
+            <div class="submenu-content">
+              <a href="inventory.html">Inventory</a>
+              <a href="status.html">Status</a>
+            </div>
+          </div>
+          <a href="status.html">PDPFP</a>
+        </div>
+      </div>
+      <a href="Techsamp.html"><i class="fas fa-headset"></i> Technical Assistance</a>
+      <a href="lgu-info.html"><i class="fas fa-city"></i> LGU Information</a>
+      <a href="report.html"><i class="fas fa-chart-pie"></i> Reports</a>
+      <a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a>
+      <a href="issuance.html" class="active"><i class="fas fa-file-alt"></i> Issuances</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+    `;
+  } else {
+    navHtml += `<a href="index.html#about">About</a><a href="index.html#contact">Contact</a>`;
+  }
+  container.innerHTML = navHtml;
+  setTimeout(() => {
+    document.querySelectorAll(".dropdown-submenu .submenu-trigger").forEach((trigger) => {
+      trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const submenu = trigger.closest(".dropdown-submenu");
+        if (submenu) submenu.classList.toggle("open");
+      });
+    });
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".dropdown-submenu")) {
+        document.querySelectorAll(".dropdown-submenu.open").forEach((s) => s.classList.remove("open"));
+      }
+    });
+  }, 10);
+}
+
+function renderUserMenu() {
+  const container = document.getElementById("userMenuContainer");
+  if (!container) return;
+  if (currentUser) {
+    const initials = getUserInitials(currentUser.fullName);
+    const firstName = currentUser.fullName?.split(" ")[0] || "User";
+    const roleLabel = getRoleLabel(currentUser.role);
+    const roleClass = getRoleClass(currentUser.role);
+    container.innerHTML = `
+      <div class="user-menu" id="userMenuDropdown" style="position:relative;">
+        <div class="user-avatar">${initials}</div>
+        <span class="user-name">${escapeHtml(firstName)}</span>
+        <span class="role-badge-header ${roleClass}">${roleLabel}</span>
+        <span style="font-size:0.6rem;">▼</span>
+        <div class="user-dropdown-menu">
+          <div class="user-dropdown-item">👤 ${escapeHtml(currentUser.email)}</div>
+          <div class="user-dropdown-item">🏢 ${escapeHtml(currentUser.office || "ELUPDD")}</div>
+          ${currentUser.role === "admin" ? `<div class="user-dropdown-item" id="adminConsoleLink">⚙️ Manage Users</div>` : ""}
+          <div class="user-dropdown-item" id="logoutDropdownBtn" style="color:#dc2626;">🚪 Sign Out</div>
+        </div>
+      </div>
+    `;
+    const userDiv = document.getElementById("userMenuDropdown");
+    if (userDiv) {
+      userDiv.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const menu = userDiv.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = menu.style.display === "block" ? "none" : "block";
+      });
+      document.addEventListener("click", () => {
+        const menu = userDiv?.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = "none";
+      });
+    }
+    if (currentUser.role === "admin") {
+      const adminBtn = document.getElementById("adminConsoleLink");
+      if (adminBtn) adminBtn.addEventListener("click", () => (window.location.href = "admin.html"));
+    }
+    const logoutBtn = document.getElementById("logoutDropdownBtn");
+    if (logoutBtn) logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("dhsud_session");
+      showToast("Logged Out", "You have been logged out successfully.", "info");
+      setTimeout(() => { window.location.href = "issuance.html"; }, 700);
+    });
+  } else {
+    container.innerHTML = `<div class="login-prompt" onclick="openLoginModal()"><i class="fas fa-sign-in-alt"></i> Sign In</div>`;
+  }
+}
+
+// ============================================
+// LOGIN MODAL (from indexGUI.html)
+// ============================================
+function openLoginModal() {
+  document.getElementById("loginModal").classList.add("active");
+}
+function closeLoginModal() {
+  document.getElementById("loginModal").classList.remove("active");
+}
+async function handleModalLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById("modalLoginEmail").value.trim().toLowerCase();
+  const password = document.getElementById("modalLoginPassword").value;
+  const btn = document.getElementById("loginModalBtn");
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Authenticating...";
+  try {
+    const resp = await fetch(`${GOOGLE_SCRIPT_URL}?action=get&data_type=users&_=${Date.now()}`);
+    const users = await resp.json();
+    const user = users.find((u) => u.email?.toLowerCase() === email);
+    if (!user) { showToast("Authentication Failed", "Account not found.", "error"); btn.innerHTML = originalText; btn.disabled = false; return false; }
+    if (user.password === encodePassword(password)) {
+      const session = { userId: user.id, email: user.email, fullName: user.fullName, office: user.office || "ELUPDD", role: user.role, loggedInAt: new Date().toISOString() };
+      localStorage.setItem("dhsud_session", JSON.stringify(session));
+      showToast("Welcome", `Welcome ${user.fullName?.split(" ")[0] || ""}!`, "success");
+      closeLoginModal();
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showToast("Authentication Failed", "Invalid password.", "error");
+    }
+  } catch (error) {
+    showToast("Connection Error", "Please try again.", "error");
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+  return false;
+}
+
+// ============================================
+// DOCUMENT DATA
+// ============================================
+const documents = [
+  { id: 1, title: "Harmonized EP-CDRA Revised Digital Template", category: "Template", sub: "CLUP Template", description: "Digital template for Enhanced Plan - Climate & Disaster Risk Assessment (EP-CDRA) – required for risk-informed land use plans.", refNumber: "v.100125", year: "2025", tags: ["cdra","template"], docUrl: "https://docs.google.com/document/d/1gMW_0EQDapi6KocdoEjPaAaAzgkngrXD/edit?usp=drive_link&ouid=113490008011186302290&rtpof=true&sd=true" },
+  { id: 2, title: "CLUP Digital Template (Full Volume)", category: "Template", sub: "CLUP Template", description: "Standard digital CLUP template with sectoral chapters, land use map integration, and zoning matrix.", refNumber: "CLUP-DT-100625", year: "2025", tags: ["clup","digital"], docUrl: "https://docs.google.com/document/d/113r6EythhDYjF2wV3rfsKE2cO1SJS3Kx/edit?usp=drive_link&ouid=113490008011186302290&rtpof=true&sd=true" },
+  { id: 3, title: "Zoning Ordinance Digital Template", category: "Template", sub: "ZO Template", description: "Model Zoning Ordinance template containing zoning districts, use regulations, and permit processes.", refNumber: "ZO-TMP-031025", year: "2025", tags: ["zoning","ordinance"], docUrl: "https://docs.google.com/document/d/1wgbJgHyy4lKKbBRF09Yx5qoIr78192Md/edit?usp=drive_link&ouid=113490008011186302290&rtpof=true&sd=true" },
+  { id: 4, title: "EP-CDRA Data Requirements Checklist", category: "Template", sub: "Data Tool", description: "Excel-based data inventory for CDRA inputs: hazard exposure, vulnerability, and risk assessment.", refNumber: "EPCDRA-DATA", year: "2025", tags: ["cdra","data"], docUrl: "https://docs.google.com/spreadsheets/d/12misVAocQ4HJTIeuwQevCFw4RVh9n5OC/edit?usp=drive_link&ouid=113490008011186302290&rtpof=true&sd=true" },
+  { id: 5, title: "Checklist for CLUP Review", category: "Template", sub: "Checklist", description: "Official review checklist for CLUP compliance (parameters, sections, legal basis alignment).", refNumber: "CLUP-CHK-REV", year: "2022", tags: ["checklist","review"], docUrl: "https://drive.google.com/file/d/1-j2bRTL-2hT3bZ0i-sUnI9LtP28US77v/view?usp=drive_link" },
+  { id: 6, title: "Checklist for CLUP Ratification", category: "Template", sub: "Checklist", description: "Procedural requirements for CLUP ratification by Sanggunian and submission.", refNumber: "RAT-CHECK", year: "2022", tags: ["ratification"], docUrl: "https://drive.google.com/file/d/1ShwMNOgVoK0-4dn1CiSkWJWs7s60uQnK/view?usp=drive_link" },
+  { id: 7, title: "Checklist for CLUP Amendments (Reclassification/Rezoning)", category: "Template", sub: "Checklist", description: "Application requirements for land reclassification and spot zoning amendments.", refNumber: "AMEND-CHECK", year: "2023", tags: ["amendment","reclassification"], docUrl: "https://drive.google.com/file/d/12eFu2Bkl40_pLG6AS-usSxhk0-P4fmR-/view?usp=drive_link" },
+  { id: 8, title: "Checklist for PDPFP Review", category: "Template", sub: "Checklist", description: "Provincial Development & Physical Framework Plan review checklist.", refNumber: "PDPFP-CHECK", year: "2023", tags: ["pdpfp"], docUrl: "https://drive.google.com/file/d/1aWegFnPpdjlQQuLgQKxqXWNsWpWPz0Ru/view?usp=drive_link" },
+  { id: 9, title: "Site Zoning Certification Form", category: "Template", sub: "Form", description: "Official request form for Site Zoning Certification issued by planning office.", refNumber: "SZC-FORM", year: "2021", tags: ["zc","certificate"], docUrl: "https://drive.google.com/file/d/1wBS1HUG9XG5mtIYEpgSSHJ8GsXS1B7u8/view?usp=drive_link" },
+  { id: 10, title: "Locational Clearance - Base Station/Wireless Infrastructure", category: "Template", sub: "Form", description: "Application form for telecommunication tower and wireless facility locational clearance.", refNumber: "LC-WIRELESS", year: "2021", tags: ["telco","clearance"], docUrl: "https://drive.google.com/file/d/18ME_kxyPyFD8kVffw2pyxu4SUuiWRGFw/view?usp=sharing" },
+  { id: 11, title: "HLURB Guidebook Vol. 1: CLUP Planning Process", category: "Guideline", sub: "CLUP Process", description: "Step-by-step process for CLUP preparation, stakeholder engagement, and situational analysis.", refNumber: "HLURB-Vol1", year: "2018", tags: ["process","guidebook"], docUrl: "https://drive.google.com/file/d/1G6pBpzGrS9g2hbOlPFDH51xjlm79sh3B/view" },
+  { id: 12, title: "HLURB Guidebook Vol. 2: Sectoral Analysis & Tools", category: "Guideline", sub: "Sectoral", description: "Sectoral studies (economic, demographic, infra) and special area studies tools.", refNumber: "HLURB-Vol2", year: "2018", tags: ["sectoral","tools"], docUrl: "https://drive.google.com/file/d/1CQ165vb8Y-EvDnZDososyrQVnuATo3ID/view" },
+  { id: 13, title: "HLURB Guidebook Vol. 3: Model Zoning Ordinance", category: "Guideline", sub: "ZO Model", description: "Model zoning ordinance provisions, land use categories, and map integration.", refNumber: "HLURB-Vol3", year: "2018", tags: ["zo","model"], docUrl: "https://drive.google.com/file/d/1r4qigs72q3pYDDW1vgXNKUdTddo7KUJe/view" },
+  { id: 14, title: "Enhanced Housing Subsector Supplemental Guidebook", category: "Guideline", sub: "Housing", description: "Integration of Local Shelter Plan standards into CLUP housing subsector; includes working tables and computation templates.", refNumber: "DC 2024-011", year: "2024", tags: ["housing","shelter"], docUrl: "https://drive.google.com/drive/folders/1mkOZgMUkVBm0AvEDKSTjMbrAbjCm0u4o?usp=drive_link" },
+  { id: 15, title: "Enhanced Climate & Disaster Risk Assessment (CDRA) Workbook", category: "Guideline", sub: "CDRA", description: "Mainstreaming CDRA results into CLUP; zero backlog by 2028 directive. Parameters for risk-informed land use plans.", refNumber: "MC 2025-004", year: "2025", tags: ["cdra","disaster"], docUrl: "https://drive.google.com/drive/folders/1nMJQ6tRctN--h3ZH7FOv9e0g7meuqHMw?usp=drive_link" },
+  { id: 16, title: "Resilient Urban Design & Development Guidelines", category: "Guideline", sub: "Urban Design", description: "Strategies for climate-resilient urban form, inclusive public spaces, design guidelines for special area studies.", refNumber: "DC 2025-005", year: "2025", tags: ["resilience","design"], docUrl: "https://dhsud.gov.ph/wp-content/uploads/Publication/Guidebooks/Resilient%20Urban%20Design%20and%20Development%20Guidelines.pdf" },
+  { id: 17, title: "Guidelines on New Towns & Planned Unit Development (PUD)", category: "Guideline", sub: "PUD", description: "Planning standards for new towns, growth centers, and PUD design integration into CLUP.", refNumber: "DC 2025-015", year: "2025", tags: ["new towns","pud"], docUrl: "https://dhsud.gov.ph/wp-content/uploads/Publication/Guidebooks/Guidelines%20on%20New%20Towns%20and%20Planned%20Unit%20Development.pdf" },
+  { id: 18, title: "Open Space Development Guidelines (Green Green Green Program)", category: "Guideline", sub: "Open Space", description: "Design strategies for open space networks, inventory for CLUP, and LGSF-Green Green Green alignment.", refNumber: "DC 2025-016", year: "2025", tags: ["openspace","green"], docUrl: "https://dhsud.gov.ph/wp-content/uploads/Publication/Guidebooks//Open%20Space%20Development%20Guidelines.pdf" },
+  { id: 19, title: "Urban Planning & Design for Climate Resilience", category: "Guideline", sub: "Climate", description: "Urban planning strategies and design interventions for climate resilience in comprehensive plans.", refNumber: "MC 2021-001", year: "2021", tags: ["resilience","climate"], docUrl: "https://dhsud.gov.ph/wp-content/uploads/Publication/Guidebooks/Reference-Tool-on-Urban-Planning-and-Design-for-Climate-Resilience-for-LGUs-Planning-Actors-in-the-Philippines_readable.pdf" },
+  { id: 20, title: "Interim Guidelines for PDPFP Formulation (JMC 2023-001)", category: "Guideline", sub: "PDPFP", description: "Joint DHSUD-DepDEV-DILG guidelines for Provincial Development and Physical Framework Plans.", refNumber: "JMC 2023-001", year: "2023", tags: ["pdpfp","provincial"], docUrl: "https://drive.google.com/file/d/1DiMF1dJHcerphaksfSsVL4iTUnvG7XGx/view?usp=sharing" },
+  { id: 21, title: "Technical Guidance: CDRA for PDPFPs", category: "Guideline", sub: "PDPFP CDRA", description: "Climate and disaster risk assessment process for formulation/updating of Provincial Development Plans.", refNumber: "DC 2025-007", year: "2025", tags: ["pdpfp","cdra"], docUrl: "https://drive.google.com/file/d/1eSVJmzCwHCfYqyIIdhsT8sFctQWiQ9Sn/view" },
+  { id: 22, title: "CLUP Communication Plan (Mandatory Requirement)", category: "Guideline", sub: "Communication", description: "Prescribing submission of CLUP Communication Plan as approval requirement for CLUP.", refNumber: "DO 2024-002", year: "2024", tags: ["commplan","approval"], docUrl: "https://drive.google.com/file/d/1z7CKYxiBBU2QI-_sdq5KxSpm31zRC2sO/view?usp=drive_link" },
+  { id: 23, title: "RA 7160 - Local Government Code (Sec.20 Land Reclassification)", category: "Law", sub: "LGC", description: "Authority of cities/municipalities to reclassify agricultural lands subject to limits and DAR/DA clearances.", refNumber: "RA 7160", year: "1991", tags: ["lgc","reclassification"], docUrl: "https://www.officialgazette.gov.ph/1991/10/10/republic-act-no-7160/" },
+  { id: 24, title: "EO 72 (1993) - Preparation & Implementation of CLUPs", category: "Law", sub: "Executive Order", description: "Providing for preparation of CLUPs by LGUs pursuant to LGC and HLURB coordination.", refNumber: "EO 72", year: "1993", tags: ["clup","policy"], docUrl: "https://www.officialgazette.gov.ph/1993/02/26/executive-order-no-72-s-1993/" },
+  { id: 25, title: "PD 1096 - National Building Code of the Philippines", category: "Law", sub: "Building Code", description: "Primary building regulations with referral codes (Green Building Code).", refNumber: "PD 1096", year: "1977", tags: ["building","code"], docUrl: "https://dpwh.gov.ph/dpwh/sites/default/files/issuances/PD1096.pdf" },
+  { id: 26, title: "BP 220 - Economic & Socialized Housing Standards", category: "Law", sub: "Housing", description: "Rules and standards for economic and socialized housing projects, subdivision development.", refNumber: "BP 220", year: "1992", tags: ["housing","subdivision"], docUrl: "/docs/BP220_Housing_Standards.pdf" },
+  { id: 27, title: "BP 344 - Accessibility Law", category: "Law", sub: "Accessibility", description: "Mandating facilities for persons with disabilities in buildings, public utilities, and establishments.", refNumber: "BP 344", year: "1983", tags: ["pwd","accessibility"], docUrl: "https://www.ncda.gov.ph/disability-laws/batas-pambansa-bilang-344/" },
+  { id: 28, title: "RA 11201 - DHSUD Act", category: "Law", sub: "DHSUD", description: "Creating Department of Human Settlements and Urban Development, transferring HLURB functions.", refNumber: "RA 11201", year: "2019", tags: ["dhsud","mandate"], docUrl: "https://www.officialgazette.gov.ph/2019/02/14/republic-act-no-11201/" },
+  { id: 29, title: "RA 10121 - Philippine DRRM Act", category: "Law", sub: "DRRM", description: "Integration of disaster risk reduction in land use planning, zoning, and local development.", refNumber: "RA 10121", year: "2010", tags: ["drrm","hazard"], docUrl: "https://www.officialgazette.gov.ph/2010/05/27/republic-act-no-10121/" },
+  { id: 30, title: "RA 12289 - ARROW Act (Right-of-Way)", category: "Law", sub: "ROW", description: "Accelerated and Reformed Right-of-Way Act for infrastructure projects.", refNumber: "RA 12289", year: "2024", tags: ["row","expropriation"], docUrl: "/docs/RA12289_ARROW_Act.pdf" },
+  { id: 31, title: "E-NIPAS (RA 11038) - Protected Areas Management", category: "Law", sub: "Environment", description: "Amending NIPAS Act, declaring protected areas and management framework.", refNumber: "RA 11038", year: "2018", tags: ["nipas","protected"], docUrl: "https://www.officialgazette.gov.ph/2018/06/22/republic-act-no-11038/" },
+  { id: 32, title: "PD 856 - Sanitation Code", category: "Law", sub: "Health", description: "Code on sanitation requirements for establishments, water supply, waste management.", refNumber: "PD 856", year: "1975", tags: ["sanitation","health"], docUrl: "/docs/PD856_Sanitation_Code.pdf" },
+  { id: 33, title: "PD 957 - Subdivision & Condominium Buyers Protective Decree", category: "Law", sub: "Real Estate", description: "Regulating subdivision and condominium development, buyer protection.", refNumber: "PD 957", year: "1976", tags: ["subdivision","condo"], docUrl: "/docs/PD957_Subdivision_Decree.pdf" },
+  { id: 34, title: "MC 54 s.1993 - Agricultural Land Reclassification Guidelines", category: "Memorandum", sub: "Reclassification", description: "Prescribing guidelines for Section 20 of RA 7160, limits and procedure for land conversion.", refNumber: "MC 54 s.1993", year: "1993", tags: ["agri","conversion"], docUrl: "https://drive.google.com/file/d/1sc4Xlm0p2Z-aV7lsqAYzd4eCc2yh0Lun/view?usp=drive_link" },
+  { id: 35, title: "Joint HLRB-DAR-DA-DILG MC (Implementing MC 54)", category: "Memorandum", sub: "Reclassification", description: "Rules implementing the authority of LGUs to reclassify lands within prescribed limits.", refNumber: "JMC 1995", year: "1995", tags: ["reclassification","jmc"], docUrl: "https://drive.google.com/file/d/1Pw5-PzMUxuU9eV7TRuF7ddKgzB14tiHo/view?usp=drive_link" },
+  { id: 36, title: "DA MC 26 s.2022 - DA Certification for Land Reclassification", category: "Memorandum", sub: "Agriculture", description: "Issuance of DA certification pursuant to MC 54 and Joint Memorandum Circular.", refNumber: "DA MC 26-2022", year: "2022", tags: ["da","clearance"], docUrl: "https://drive.google.com/file/d/1lRVA8UIBuBhxEahADQ4OhLernhaMHhIn/view?usp=drive_link" },
+  { id: 37, title: "12-Year CLUP Planning Period (Standardization)", category: "Memorandum", sub: "Planning", description: "Adoption of standardized 12-year planning period for all CLUPs nationwide.", refNumber: "DC 2025-018", year: "2025", tags: ["period","standard"], docUrl: "https://drive.google.com/file/d/1iSbFeUGCNzYxUnZSxzAlmX-UgWm0za82/view?usp=sharing" },
+  { id: 38, title: "DHSUD MC 2021-005 - CLUP/ZO Review & Approval Process", category: "Memorandum", sub: "Approval Process", description: "Revised review timelines, Annexes: timelines for cities/municipalities and HUCs; Parameters for CLUP review.", refNumber: "MC 2021-005", year: "2021", tags: ["review","approval"], docUrl: "/docs/DHSUD_MC2021-005_Review_Approval.pdf" },
+  { id: 39, title: "DHSUD MC 2021-009 - PDPFP Review & Approval Process", category: "Memorandum", sub: "PDPFP", description: "Revised process for Provincial Physical Framework Plans (PDPFPs) of provinces.", refNumber: "MC 2021-009", year: "2021", tags: ["pdpfp","review"], docUrl: "/docs/DHSUD_MC2021-009_PDPFP_Review.pdf" },
+  { id: 40, title: "DO 2020-009 - Locational Guidelines for Telecom Base Stations", category: "Memorandum", sub: "Telecom", description: "Revised locational guidelines for cellular towers, wireless communication infrastructures.", refNumber: "DO 2020-009", year: "2020", tags: ["telco","tower"], docUrl: "https://drive.google.com/drive/folders/1GVcZusHnARFCKtb0VUbHAXayr4Ala3LG?usp=drive_link" },
+  { id: 41, title: "HLURB Resolution No. 925 S.2015 - Slaughterhouse/Abattoir Guidelines", category: "Memorandum", sub: "Livestock", description: "Amending guidelines for slaughterhouse locational clearance (national/local significance).", refNumber: "Res.925", year: "2015", tags: ["abattoir","slaughter"], docUrl: "https://drive.google.com/file/d/1ZenP7LXP5hwyQqe5JkdHaeo0kw2cEQ2O/view?usp=drive_link" },
+  { id: 42, title: "LTFRB MC 2017-030 - Off-Street Terminal Operations", category: "Memorandum", sub: "Transport", description: "Guidelines for transport terminals, off-street parking and terminal standards.", refNumber: "MC 2017-030", year: "2017", tags: ["terminal","transport"], docUrl: "https://drive.google.com/file/d/17ECfbpzFPHw7pWs7pRpkqFbbJ-0UKc2u/view?usp=drive_link" },
+  { id: 43, title: "DENR DAO 2021-07 - Legal Easements Along Seas, Rivers, Lakes, Esteros", category: "Development Control", sub: "Easement", description: "Establishment of legal easements, buffer zones along water bodies.", refNumber: "DAO 2021-07", year: "2021", tags: ["easement","buffer"], docUrl: "https://drive.google.com/drive/u/3/folders/1LcN9vY2ifGyxoNCi_bjenW6thZBcb40x" },
+  { id: 44, title: "EMB MC 2014-005 - EIS System Coverage & Requirements", category: "Development Control", sub: "EIA", description: "Screening and standardized requirements under Philippine Environmental Impact Statement System.", refNumber: "MC 2014-005", year: "2014", tags: ["eia","environment"], docUrl: "https://drive.google.com/file/d/1063AuhXTJ3DNomr553Axs6m1r58XulWZ/view?usp=drive_link" },
+  { id: 45, title: "BAI AO 04 s.2004 - Distance Between Poultry/Livestock Farms", category: "Development Control", sub: "Agriculture", description: "Regulating minimum distance between livestock and poultry farms.", refNumber: "BAI AO 04", year: "2004", tags: ["livestock","distance"], docUrl: "https://drive.google.com/drive/folders/1AwdYveEgZrrxfTxLmgePGqsgQmp_X7t4?usp=drive_link" },
+  { id: 46, title: "DENR AO 2004-59 - Special Uses of Forestlands", category: "Development Control", sub: "Forestry", description: "Rules governing special land use permits within forestlands.", refNumber: "DAO 2004-59", year: "2004", tags: ["forest","special use"], docUrl: "https://drive.google.com/file/d/18kbKBodt9n0InmDe3cV4YqOTw6zZBEDF/view?usp=drive_link" },
+  { id: 47, title: "DOE DC 2017-11-0011 - Liquid Fuels Retailing (TSRO)", category: "Development Control", sub: "Energy", description: "Rules for liquid fuels retail outlets, TSRO requirements.", refNumber: "DC 2017-11-0011", year: "2017", tags: ["fuel","retail"], docUrl: "/docs/DOE_DC2017-11-0011_Fuel_Retail.pdf" },
+  { id: 48, title: "DHSUD DC 2025-021 - Locational Clearance for Liquid Fuels & Auto-LPG Stations", category: "Development Control", sub: "Energy", description: "Processing of locational clearance for fuel stations and LPG dispensing.", refNumber: "DC 2025-021", year: "2025", tags: ["lpg","clearance"], docUrl: "https://drive.google.com/drive/folders/189FECA5RJyaywBEky09oMaRQ7ES8CDED?usp=drive_link" },
+  { id: 49, title: "CAAP Manual of Standards for Aerodromes", category: "Development Control", sub: "Aviation", description: "Design and safety standards for aerodromes, airport protection zones.", refNumber: "CAAP", year: "2020", tags: ["aerodrome","airport"], docUrl: "https://drive.google.com/file/d/15hMOechJb_lTKhf8dUEJSWC_StrvCBi_/view?usp=sharing" },
+  { id: 50, title: "Areas for Priority Development (APD) - Blighted/Vacant Lands", category: "Development Control", sub: "Urban Renewal", description: "Land use planning guidelines for APD: blighted areas, idle lands redevelopment.", refNumber: "APD Guidelines", year: "2015", tags: ["apd","blighted"], docUrl: "https://drive.google.com/drive/folders/1txzbmWozfctcTHux1pwvigU3SJkLpSKE?usp=drive_link" },
+  { id: 51, title: "Cockpit Design Standards & Guidelines", category: "Development Control", sub: "Recreation", description: "Locational and structural design standards for cockpits/arenas.", refNumber: "Cockpit", year: "2018", tags: ["cockpit","arena"], docUrl: "https://drive.google.com/drive/folders/1HPT4kPtMItbNEzHA_3YEGS0mCZ2hR7G5?usp=drive_link" },
+  { id: 52, title: "Columbarium Projects - Rules & Regulations", category: "Development Control", sub: "Cemetery", description: "Governs columbarium development, setbacks, and locational criteria.", refNumber: "Columbarium", year: "2019", tags: ["columbarium"], docUrl: "https://drive.google.com/drive/folders/19I0KiH0DFTqBFeHdvSVwI1S6XPrO_sDP?usp=drive_link" },
+  { id: 53, title: "Funeral Establishments - Locational Clearance & Design Standards", category: "Development Control", sub: "Public Services", description: "Application and design standards for funeral homes and chapels.", refNumber: "Funeral Est", year: "2017", tags: ["funeral"], docUrl: "https://drive.google.com/drive/folders/1WAewcs356W-pbUFCx0DU6wziCWUdiBCu?usp=drive_link" },
+  { id: 54, title: "Memorial Parks & Cemeteries (Amended AO 13)", category: "Development Control", sub: "Cemetery", description: "Rules and regulations for memorial park development, setbacks, landscaping.", refNumber: "AO 13", year: "2016", tags: ["cemetery"], docUrl: "https://drive.google.com/drive/folders/1uyXLpdp1lz-3HR9ulSymDQL5xSMOJFCQ?usp=drive_link" },
+  { id: 55, title: "Land Terminals - Design Standards (DPWH/LTFRB)", category: "Development Control", sub: "Transport", description: "Design standards and guidelines for land transport terminals and garages.", refNumber: "Terminal Std", year: "2018", tags: ["terminal","garage"], docUrl: "https://drive.google.com/drive/folders/1A4fyDiPMGLqqViyrNZvULjjF2iUqGIBR?usp=drive_link" },
+  { id: 56, title: "Manufacturing Industries - Locational Guidelines", category: "Development Control", sub: "Industry", description: "Locational standards and buffer zones for manufacturing plants.", refNumber: "Ind'l Guide", year: "2012", tags: ["manufacturing","industry"], docUrl: "https://drive.google.com/drive/folders/11xn0WKmhBk4x_KEBvUA9pY2zhfgc9AgK?usp=drive_link" },
+  { id: 57, title: "BJMP Manual on Habitat, Water, Sanitation in Jails", category: "Development Control", sub: "Correctional", description: "Design and sanitation standards for jail facilities (ICRC-BJMP).", refNumber: "BJMP Manual", year: "2019", tags: ["jail","detention"], docUrl: "https://drive.google.com/file/d/1dm80RlVM9LLwFfLOuRGR62OClUTpddXu/view?usp=sharing" },
+  { id: 58, title: "Green Building Code (Referral Code of PD 1096)", category: "Development Control", sub: "Sustainability", description: "Energy efficiency, water conservation, and sustainable design provisions.", refNumber: "GB Code", year: "2015", tags: ["green","sustainable"], docUrl: "https://drive.google.com/file/d/17CiMwDMP7V1nhebCCQYIXBwU7F7JeTjK/view?usp=drive_link" },
+  { id: 59, title: "Farmlot Subdivisions - Design Standards", category: "Development Control", sub: "Agri", description: "AO and design standards for agricultural farmlot subdivisions.", refNumber: "Farmlot", year: "2010", tags: ["farmlot","agri"], docUrl: "https://drive.google.com/drive/folders/18reqmTvlVSe7UvkWwGjKa6LG46OJX3x7?usp=drive_link" },
+  { id: 60, title: "Industrial Estate - Design & Locational Guidelines", category: "Development Control", sub: "Industrial", description: "Standards for industrial estate development, utilities, and buffer.", refNumber: "Ind'l Estate", year: "2014", tags: ["industrial estate"], docUrl: "https://drive.google.com/drive/folders/1t9xZhHH81znc_a4pI5HtKjRMHgfVKVBR?usp=drive_link" },
+  { id: 61, title: "DENR MC 2009-14 - 50m Buffer Zone for Banana Plantations", category: "Development Control", sub: "Agriculture", description: "Strict implementation of 50m buffer from residential areas/water bodies to banana plantations.", refNumber: "MC 2009-14", year: "2009", tags: ["buffer","banana"], docUrl: "https://drive.google.com/file/d/1DMvjehS0_cA2uMsY5tXYOvbyrb9i6NMJ/view?usp=sharing" },
+  { id: 62, title: "DepED Educational Facilities Manual (DRR Integration)", category: "Development Control", sub: "Education", description: "Handbook on educational facilities integrating disaster risk reduction in school construction.", refNumber: "DepED Manual", year: "2010", tags: ["school","drr"], docUrl: "https://drive.google.com/file/d/1TzUu4oB1-wpAjF0rfLkxWFuX4R6p3X_c/view?usp=sharing" },
+  { id: 63, title: "DOH Hospital Planning & Design Guidelines", category: "Development Control", sub: "Health", description: "Standards for hospital location, bed capacity, and facility design.", refNumber: "DOH Hosp", year: "2014", tags: ["hospital","health"], docUrl: "https://drive.google.com/drive/folders/1HpqvDLEjHxxceglkeyaLPG7wh3K6YXDF?usp=drive_link" },
+  { id: 64, title: "WHO District Hospitals: Guidelines for Development", category: "Development Control", sub: "Health", description: "International standards for district hospital planning and catchment area.", refNumber: "WHO", year: "2018", tags: ["who","hospital"], docUrl: "https://drive.google.com/file/d/1EyFeAKlEnXX2mK6D2c_XJF2aT_4s_h4W/view?usp=sharing" },
+  { id: 65, title: "DPWH Design Guidelines Vol.6 - Public Buildings", category: "Development Control", sub: "Infra", description: "Criteria and standards for public buildings, government facilities.", refNumber: "DPWH Vol6", year: "2019", tags: ["public bldg"], docUrl: "https://drive.google.com/file/d/1dCpO2I_1jiNLLJ3KoXYfYDkVycP6peY4/view?usp=drive_link" },
+  { id: 66, title: "Heritage Conservation Issuances", category: "Development Control", sub: "Heritage", description: "Guidelines for conservation districts, heritage zones, and protected structures.", refNumber: "Heritage", year: "2010", tags: ["heritage","conservation"], docUrl: "https://drive.google.com/drive/folders/1V_8wT7s_eLiG4xzgQ32ckRs84b-8q9K8?usp=drive_link" },
+  { id: 67, title: "RA 7076 & RA 7942 - Small Scale Mining & Philippine Mining Act IRR", category: "Development Control", sub: "Mining", description: "Implementing rules for people's small-scale mining and large-scale mining permits.", refNumber: "Mining Act", year: "1995", tags: ["mining","small scale"], docUrl: "https://drive.google.com/drive/folders/1FpLOeRCnL4aNYTbACD_oC_ChB5gommee?usp=drive_link" },
+  { id: 68, title: "Gaming Site Regulatory Manual (Distance Requirements)", category: "Development Control", sub: "Gaming", description: "Site location distance requirements for casinos, bingo parlors, gaming establishments.", refNumber: "Gaming", year: "2018", tags: ["gaming","casino"], docUrl: "https://drive.google.com/file/d/1ZZ0U-bYVgkT-eD2UKVRSy4fJmjJKnCA8/view?usp=sharing" }
+];
+
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
+function renderCards(docArray, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (!docArray.length) {
+    container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-file-alt"></i><p>📭 No entries match.</p></div>';
+    return;
+  }
+  container.innerHTML = docArray.map(doc => `
+    <div class="doc-card" data-id="${doc.id}">
+      <div class="doc-header">
+        <span class="doc-icon">${doc.category === 'Template' ? '📄' : (doc.category === 'Guideline' ? '📘' : (doc.category === 'Law' ? '⚖️' : (doc.category === 'Memorandum' ? '📋' : '🏭')))}</span>
+        <div class="doc-title">${escapeHtml(doc.title)}</div>
+      </div>
+      <div class="doc-meta">
+        <span class="doc-category">${escapeHtml(doc.category)}${doc.sub ? ` / ${escapeHtml(doc.sub)}` : ''}</span>
+        <span>📅 ${doc.year || '—'}</span>
+        <span>🔖 ${escapeHtml(doc.refNumber || 'N/A')}</span>
+      </div>
+      <div class="doc-desc">${escapeHtml(doc.description)}</div>
+      <div class="doc-footer">
+        <a href="${escapeHtml(doc.docUrl)}" class="btn-download" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> View Reference</a>
+        <button class="btn-view" onclick="showDetails(${doc.id})"><i class="fas fa-info-circle"></i> Legal Basis</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.showDetails = function(id) {
+  const doc = documents.find(d => d.id === id);
+  if (doc) {
+    const tags = doc.tags?.join(', ') || '—';
+    showToast("📌 " + doc.title, 
+      "📂 Category: " + doc.category + 
+      "\n📜 Legal/Ref: " + doc.refNumber + 
+      "\n📝 Description: " + doc.description + 
+      "\n🏷️ Tags: " + tags, 
+      "info", 6000);
+  }
+};
+
+// ============================================
+// FILTER & RENDER
+// ============================================
+let globalSearch = "", categoryFilter = "all", activeTab = "templates";
+
+function filterAndRender() {
+  let filtered = documents.filter(d => {
+    let matchSearch = globalSearch === "" || 
+      d.title.toLowerCase().includes(globalSearch) || 
+      d.description.toLowerCase().includes(globalSearch) || 
+      d.refNumber.toLowerCase().includes(globalSearch) || 
+      (d.tags && d.tags.some(t => t.includes(globalSearch)));
+    let matchCat = categoryFilter === "all" || d.category === categoryFilter;
+    return matchSearch && matchCat;
+  });
+  
+  let templates = filtered.filter(d => d.category === "Template");
+  let guidelines = filtered.filter(d => d.category === "Guideline");
+  let lawsCombined = filtered.filter(d => d.category === "Law" || d.category === "Memorandum");
+  let devControls = filtered.filter(d => d.category === "Development Control");
+  
+  renderCards(templates, "templatesGrid");
+  renderCards(guidelines, "guidelinesGrid");
+  renderCards(lawsCombined, "lawsGrid");
+  renderCards(devControls, "devcontrolsGrid");
+  
+  let anyVisible = (templates.length + guidelines.length + lawsCombined.length + devControls.length) > 0;
+  document.getElementById("emptyMessage").style.display = anyVisible ? "none" : "block";
+}
+
+function switchTab(tabId) {
+  activeTab = tabId;
+  document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+  document.getElementById(`${tabId}Pane`).classList.add("active");
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+  document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add("active");
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+function init() {
+  checkSession();
+  renderMainNavigation();
+  renderUserMenu();
+  filterAndRender();
+  
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      switchTab(btn.getAttribute("data-tab"));
+    });
+  });
+  
+  document.getElementById("globalSearch").addEventListener("input", (e) => {
+    globalSearch = e.target.value.toLowerCase();
+    filterAndRender();
+  });
+  
+  document.getElementById("categoryFilter").addEventListener("change", (e) => {
+    categoryFilter = e.target.value;
+    filterAndRender();
+  });
+  
+  document.getElementById("clearFiltersBtn").addEventListener("click", () => {
+    document.getElementById("globalSearch").value = "";
+    document.getElementById("categoryFilter").value = "all";
+    globalSearch = "";
+    categoryFilter = "all";
+    filterAndRender();
+    showToast("Filters Cleared", "All filters have been reset.", "info");
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  const form = document.getElementById("modalLoginForm");
+  if (form) form.addEventListener("submit", handleModalLogin);
+  init();
+});
+
+// Modal close on backdrop click
+window.onclick = function(e) {
+  const loginModal = document.getElementById("loginModal");
+  if (e.target === loginModal) closeLoginModal();
+};
+
+// Expose functions globally
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
+window.showDetails = showDetails;
+</script>
+</body>
+</html>

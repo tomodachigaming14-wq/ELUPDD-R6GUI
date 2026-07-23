@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DHSUD VI | ELUPDD - Inventory of CLUP and ZO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* ===== BASE STYLES (from indexGUI.html) ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", "Segoe UI", Roboto, sans-serif; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 1.5rem 1.5rem 2rem;
+      background: #f4f7fc;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(26, 115, 232, 0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, rgba(0, 200, 150, 0.06) 0%, transparent 60%),
+                  linear-gradient(145deg, #f0f4f8 0%, #e8edf3 100%);
+      z-index: 0;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(25px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+      0% { opacity: 0; transform: translateX(-40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      0% { opacity: 0; transform: translateX(40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+    .animate-fadeUp { animation: fadeUp 0.7s ease forwards; }
+    .animate-slideLeft { animation: slideInLeft 0.6s ease forwards; }
+    .animate-slideRight { animation: slideInRight 0.6s ease forwards; }
+
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== HEADER / NAVIGATION (from indexGUI.html) ===== */
+    .app-header {
+      width: 100%;
+      max-width: 1280px;
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: white;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      position: relative;
+      z-index: 5;
+    }
+    .app-header .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .app-header .brand img {
+      height: 42px;
+      width: auto;
+      display: block;
+      border-radius: 8px;
+    }
+    .app-header .brand span {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #1e3a8a;
+      letter-spacing: -0.3px;
+    }
+    .app-header .brand small {
+      font-weight: 400;
+      font-size: 0.6rem;
+      color: #64748b;
+      display: block;
+      margin-top: -2px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Navigation links - center */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      flex: 1;
+      justify-content: center;
+    }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-decoration: none;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .nav-links a i { font-size: 0.8rem; }
+    .nav-links a:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .nav-links a.active {
+      background: #1e3a8a;
+      color: white;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+    .nav-links a.active:hover {
+      background: #2563eb;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropbtn {
+      background: none;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+    .dropbtn:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: white;
+      min-width: 210px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      z-index: 1000;
+      top: 36px;
+      left: 0;
+      border: 1px solid #eef2ff;
+      padding: 0.3rem 0;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 0.6rem 1.2rem;
+      color: #1e293b;
+      font-size: 0.75rem;
+      text-decoration: none;
+      border: none;
+      background: none;
+      border-radius: 0;
+    }
+    .dropdown-content a:hover {
+      background: #eff6ff;
+    }
+    .dropdown-submenu {
+      position: relative;
+    }
+    .submenu-trigger {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: inherit;
+    }
+    .submenu-trigger:hover { background: #eff6ff; }
+    .arrow-right { font-size: 0.7rem; margin-left: 1rem; }
+    .submenu-content {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: white;
+      min-width: 170px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      border: 1px solid #eef2ff;
+      z-index: 1001;
+      padding: 0.3rem 0;
+    }
+    .dropdown-submenu:hover .submenu-content {
+      display: block;
+    }
+    .submenu-content a { padding: 0.6rem 1.2rem; }
+    .dropbtn::after {
+      content: " ▾";
+      font-size: 0.6rem;
+      opacity: 0.6;
+    }
+    .dropdown:hover .dropbtn::after {
+      opacity: 1;
+    }
+
+    /* User menu - right side */
+    .user-menu-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.15rem 0.5rem 0.15rem 0.7rem;
+      border-radius: 60px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .user-menu:hover { background: #e2e8f0; }
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      background: #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .user-name {
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    .role-badge-header {
+      background: #e2e8f0;
+      padding: 0.1rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.55rem;
+      font-weight: 600;
+    }
+    .role-badge-header.admin { background: #dcfce7; color: #166534; }
+    .role-badge-header.staff { background: #dbeafe; color: #1e40af; }
+    .user-dropdown-menu {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: white;
+      border-radius: 20px;
+      min-width: 180px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+      border: 1px solid #eef2ff;
+      overflow: hidden;
+      display: none;
+      z-index: 200;
+    }
+    .user-dropdown-item {
+      padding: 0.7rem 1.2rem;
+      border-bottom: 1px solid #f1f5f9;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .user-dropdown-item:hover { background: #f8fafc; }
+    .login-prompt {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.2rem 0.8rem 0.2rem 1rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #1e3a8a;
+    }
+    .login-prompt:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* ===== TOAST NOTIFICATIONS (from indexGUI.html) ===== */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      width: 100%;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transform: translateX(120%);
+      animation: slideIn 0.5s ease forwards;
+      border-left: 5px solid #2563eb;
+      min-height: 60px;
+    }
+    .toast.hiding { animation: slideOut 0.4s ease forwards; }
+    .toast-success { border-left-color: #10b981; }
+    .toast-error { border-left-color: #ef4444; }
+    .toast-info { border-left-color: #2563eb; }
+    .toast-warning { border-left-color: #f59e0b; }
+
+    .toast-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .toast-success .toast-icon { background: #d1fae5; color: #059669; }
+    .toast-error .toast-icon { background: #fee2e2; color: #dc2626; }
+    .toast-info .toast-icon { background: #dbeafe; color: #2563eb; }
+    .toast-warning .toast-icon { background: #fef3c7; color: #d97706; }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 0.9rem; color: #0f172a; }
+    .toast-message { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+    .toast-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+    .toast-close:hover { color: #475569; }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(120%); opacity: 0; }
+    }
+
+    /* ===== CARD (from indexGUI.html) ===== */
+    .hero-innovations {
+      background: white;
+      border-radius: 28px;
+      margin: 0 0 2rem 0;
+      padding: 2.5rem 3rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .innov-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .innov-text { flex: 1.2; }
+    .innov-text h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0f2b3a, #1e4a76);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.8rem;
+    }
+    .innov-text p {
+      font-size: 0.95rem;
+      color: #2c4c6e;
+      margin-bottom: 1.5rem;
+      max-width: 90%;
+    }
+    .platform-badges {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .badge-pill {
+      background: #f1f5f9;
+      border-radius: 60px;
+      padding: 0.2rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .badge-pill:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+    }
+    .badge-pill i { margin-right: 4px; }
+    .innov-image { flex: 0.8; text-align: center; animation: float 4s ease-in-out infinite; }
+    .innov-image img {
+      max-width: 100%;
+      border-radius: 24px;
+      background: white;
+      padding: 0.6rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    /* ===== SECTION HEADER (from indexGUI.html) ===== */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+      border-left: 6px solid #2563eb;
+      padding-left: 1rem;
+    }
+    .section-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0f2b3a;
+    }
+    .section-header h2 i { color: #2563eb; margin-right: 8px; }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      background: white;
+      border-radius: 28px;
+      padding: 2.5rem 3rem;
+      margin-bottom: 2rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 0.5rem;
+    }
+    .page-header p {
+      color: #64748b;
+      font-size: 1rem;
+    }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 24px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -12px rgba(0, 0, 0, 0.1);
+      border-color: #2563eb;
+    }
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #1e3a8a;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 0.3rem;
+    }
+
+    /* ===== LGU HYPERLINK ===== */
+    .lgu-hyperlink {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      border-radius: 28px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .lgu-hyperlink:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -8px rgba(37, 99, 235, 0.3);
+    }
+    .lgu-hyperlink a {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 28px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50px;
+      transition: 0.3s;
+    }
+    .lgu-hyperlink a:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* ===== MODAL (from indexGUI.html) ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-box {
+      background: white;
+      border-radius: 24px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      border-radius: 24px 24px 0 0;
+    }
+    .modal-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-header h2 i { color: white; }
+    .modal-header .close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .modal-header .close-btn:hover {
+      background: rgba(255,255,255,0.4);
+      transform: rotate(90deg);
+    }
+    .modal-body {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-footer {
+      padding: 1rem 2rem;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: #f8fafc;
+      border-radius: 0 0 24px 24px;
+    }
+    .modal-footer .btn-close-modal {
+      background: #2563eb;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85rem;
+    }
+    .modal-footer .btn-close-modal:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    /* ===== SELECTOR GROUP ===== */
+    .selector-group {
+      margin-bottom: 1.2rem;
+    }
+    .selector-group label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #334155;
+      margin-bottom: 0.4rem;
+    }
+    .selector-group select,
+    .selector-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+      background: white;
+      transition: all 0.25s ease;
+      outline: none;
+    }
+    .selector-group select:focus,
+    .selector-group input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .selected-info {
+      background: #eef2ff;
+      padding: 0.75rem 1rem;
+      border-radius: 16px;
+      margin-bottom: 1.2rem;
+      text-align: center;
+      font-weight: 500;
+      color: #1e40af;
+    }
+    .selected-info.hidden { display: none; }
+
+    /* ===== DRIVE FOLDER ===== */
+    .drive-folder {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.2rem;
+      border: 1px solid #eef2ff;
+    }
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 0.8rem;
+    }
+    .doc-header h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin: 0;
+    }
+    .drive-doc-list {
+      list-style: none;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    .drive-doc-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+    }
+    .drive-doc-list li:last-child { border-bottom: none; }
+    .drive-doc-list a {
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: 500;
+      flex: 1;
+      cursor: pointer;
+    }
+    .drive-doc-list a:hover {
+      text-decoration: underline;
+      color: #1e40af;
+    }
+    .drive-doc-list .file-icon { font-size: 1.1rem; }
+
+    /* ===== UPLOAD BUTTONS ===== */
+    .upload-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .upload-btn:hover {
+      background: #1e3a8a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    .upload-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .upload-status {
+      font-size: 0.7rem;
+      color: #166534;
+      margin-left: 8px;
+    }
+    .upload-progress {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #e2e8f0;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .file-input-hidden { display: none; }
+
+    /* ===== DELETE MODE ===== */
+    .delete-mode-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      background: #f1f5f9;
+      border-radius: 12px;
+    }
+    .delete-mode-toggle label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .delete-mode-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #dc2626;
+    }
+    .delete-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+    .delete-btn:hover {
+      background: #b91c1c;
+      transform: scale(1.05);
+    }
+    .delete-btn.visible { display: inline-flex; }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #e2e8f0;
+      transition: 0.2s;
+    }
+    .file-item:hover {
+      background: #f8fafc;
+      padding-left: 8px;
+      border-radius: 8px;
+    }
+    .file-item .file-info {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .file-item .delete-checkbox { display: none; margin-right: 8px; }
+    .file-item .delete-checkbox.visible { display: block; }
+    .file-item .delete-checkbox input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #dc2626;
+    }
+    .file-item.deleting {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .bulk-delete-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: #fef2f2;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #fecaca;
+    }
+    .bulk-delete-bar.visible { display: flex; }
+    .bulk-delete-bar .selected-count {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #991b1b;
+    }
+    .bulk-delete-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .bulk-delete-btn:hover { background: #b91c1c; }
+    .bulk-delete-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ===== GOOGLE DRIVE LINK ===== */
+    .google-drive-link {
+      background: #eef2ff;
+      border-radius: 20px;
+      padding: 1.2rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .btn-drive {
+      display: inline-block;
+      background: #1e3a8a;
+      color: white;
+      padding: 10px 24px;
+      border-radius: 40px;
+      text-decoration: none;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .btn-drive:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    /* ===== SUBMIT BUTTON ===== */
+    .submit-doc-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 16px;
+      transition: 0.2s;
+      font-size: 0.9rem;
+    }
+    .submit-doc-btn:hover {
+      background: #1e3a8a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .note-text {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    /* ===== FILE PREVIEW MODAL ===== */
+    .file-preview-modal {
+      display: none;
+      position: fixed;
+      z-index: 100000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(8px);
+    }
+    .file-preview-modal.active { display: flex; }
+    .file-preview-content {
+      background: white;
+      border-radius: 20px;
+      max-width: 90%;
+      max-height: 90%;
+      width: auto;
+      padding: 20px;
+      position: relative;
+      overflow: auto;
+    }
+    .file-preview-content img,
+    .file-preview-content iframe {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 12px;
+    }
+    .file-preview-content iframe {
+      width: 800px;
+      height: 600px;
+      border: none;
+    }
+    .file-preview-close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #1e293b;
+      background: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: 0.2s;
+    }
+    .file-preview-close:hover {
+      background: #f1f5f9;
+      transform: scale(1.1);
+    }
+    .file-preview-name {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #0f172a;
+      font-size: 1.1rem;
+    }
+    .file-preview-actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .file-preview-actions a {
+      padding: 8px 20px;
+      background: #2563eb;
+      color: white;
+      border-radius: 40px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: 0.2s;
+    }
+    .file-preview-actions a:hover {
+      background: #1e3a8a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    .file-preview-loading {
+      text-align: center;
+      padding: 40px;
+      color: #94a3b8;
+    }
+
+    /* ===== LOGIN MODAL (from indexGUI.html) ===== */
+    .login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .login-modal.active { display: flex; }
+    .login-modal-content {
+      background: white;
+      border-radius: 2.5rem;
+      max-width: 440px;
+      width: 92%;
+      overflow: hidden;
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.4);
+      animation: fadeUp 0.3s ease;
+    }
+    .login-modal-brand {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+    .login-modal-brand img {
+      width: 110px;
+      height: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      display: inline-block;
+      margin-bottom: 0.6rem;
+    }
+    .login-modal-brand h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.1rem; }
+    .login-modal-brand p { font-size: 0.7rem; opacity: 0.85; }
+    .login-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: 0.2s;
+    }
+    .login-modal-close:hover { opacity: 1; transform: scale(1.1); }
+    .login-modal-body { padding: 1.8rem 1.8rem 1.2rem; }
+    .login-modal-body .input-group { margin-bottom: 1rem; }
+    .login-modal-body .input-group label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #54708f;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.3px;
+    }
+    .login-modal-body .input-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .login-modal-body .input-group input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .login-submit-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 1.2rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .login-submit-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .login-submit-btn:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+    .login-modal-footer {
+      text-align: center;
+      font-size: 0.6rem;
+      color: #94a3b8;
+      padding: 0.4rem 0 1rem;
+      border-top: 1px solid #eef2ff;
+      margin: 0 1.8rem;
+    }
+
+    /* ===== FOOTER (from indexGUI.html) ===== */
+    .footer-new {
+      background: #0a2540;
+      color: #b9d0e7;
+      padding: 2rem 0;
+      margin-top: 3rem;
+      border-top: 1px solid #2d4f6e;
+      width: 100%;
+    }
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .social-icons i {
+      font-size: 1.6rem;
+      margin-right: 0.8rem;
+      color: white;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .social-icons i:hover {
+      transform: translateY(-4px);
+      color: #3b82f6;
+    }
+    .footer-new .logo-image {
+      height: 40px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      margin-bottom: 12px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .app-header { flex-wrap: wrap; gap: 0.5rem; padding: 0.6rem 1rem; }
+      .nav-links { flex: 1 1 100%; justify-content: center; order: 2; }
+      .user-menu-section { order: 3; justify-content: center; width: 100%; }
+      .brand { order: 1; }
+    }
+    @media (max-width: 800px) {
+      .app-header { flex-direction: column; align-items: stretch; padding: 0.6rem 1rem; }
+      .nav-links { flex-wrap: wrap; justify-content: center; order: 2; }
+      .user-menu-section { justify-content: center; margin-top: 0.3rem; order: 3; width: 100%; }
+      .brand { order: 1; justify-content: center; }
+      .hero-innovations { padding: 1.5rem; }
+      .innov-grid { flex-direction: column; }
+      .innov-text p { max-width: 100%; }
+      .innov-image { flex: 1; }
+      .page-header { padding: 1.5rem; }
+      .page-header h1 { font-size: 1.5rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .modal-box { max-width: 100%; margin: 0.5rem; }
+      .modal-body { padding: 1rem; }
+      .login-modal-brand img { width: 90px; }
+      .brand span { font-size: 0.9rem; }
+      .brand img { height: 34px; }
+      .file-preview-content iframe { width: 100%; height: 400px; }
+      .bulk-delete-bar { flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media (max-width: 500px) {
+      .container { padding: 0 12px; }
+      .hero-innovations { padding: 1rem; margin: 1rem 0; }
+      .innov-text h1 { font-size: 1.6rem; }
+      .page-header h1 { font-size: 1.2rem; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .contact-section { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== HEADER (from indexGUI.html) ===== -->
+<div class="app-header">
+  <div class="brand">
+    <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+    <div>
+      <span>DHSUD VI - ELUPDD</span>
+      <small>CLUP & ZO Integrated System</small>
+    </div>
+  </div>
+  <div class="nav-links" id="mainNavContainer">
+    <!-- Dynamically rendered -->
+  </div>
+  <div class="user-menu-section" id="userMenuContainer">
+    <!-- Dynamically rendered -->
+  </div>
+</div>
+
+<main>
+  <div class="container">
+    <!-- ===== HERO (from indexGUI.html) ===== -->
+    <div class="hero-innovations">
+      <div class="innov-grid">
+        <div class="innov-text">
+          <h1>Inventory of CLUP and ZO</h1>
+          <p>Complete catalog of Comprehensive Land Use Plans and Zoning Ordinances for Region VI. Browse, view, and manage documents for all provinces and municipalities.</p>
+          <div class="platform-badges">
+            <span class="badge-pill"><i class="fas fa-file-pdf"></i> CLUP Documents</span>
+            <span class="badge-pill"><i class="fas fa-gavel"></i> ZO Documents</span>
+            <span class="badge-pill"><i class="fas fa-folder-open"></i> Supporting Files</span>
+            <span class="badge-pill"><i class="fas fa-cloud-upload-alt"></i> Upload Documents</span>
+          </div>
+        </div>
+        <div class="innov-image">
+          <img src="img/ELUPDD.png" alt="ELUPDD Official Logo" onerror="this.style.display='none'" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STATS ===== -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-number">342</div><div class="stat-label">Total CLUP Documents</div></div>
+      <div class="stat-card"><div class="stat-number">298</div><div class="stat-label">Total ZO Documents</div></div>
+      <div class="stat-card"><div class="stat-number">156</div><div class="stat-label">LGUs Covered</div></div>
+      <div class="stat-card"><div class="stat-number">89%</div><div class="stat-label">Digitization Rate</div></div>
+    </div>
+
+    <!-- ===== LGU HYPERLINK ===== -->
+    <div class="lgu-hyperlink">
+      <a href="#" id="lguHyperlinkBtn">
+        <i class="fas fa-folder-open"></i> Click here to access CLUP/ZO Documents
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- ===== DOCUMENT MODAL ===== -->
+<div id="documentModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2><i class="fas fa-folder-open"></i> CLUP/ZO Documents Viewer</h2>
+      <button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="selector-group">
+        <label><i class="fas fa-landmark"></i> Select Province:</label>
+        <select id="provinceSelect">
+          <option value="">-- Select Province --</option>
+          <option value="Aklan">AKLAN</option>
+          <option value="Antique">ANTIQUE</option>
+          <option value="Capiz">CAPIZ</option>
+          <option value="Guimaras">GUIMARAS</option>
+          <option value="Iloilo">ILOILO</option>
+        </select>
+      </div>
+      <div class="selector-group" id="lguSelectorGroup" style="display:none;">
+        <label><i class="fas fa-city"></i> Select Municipality/City:</label>
+        <select id="lguSelect">
+          <option value="">-- Select LGU --</option>
+        </select>
+      </div>
+      <div id="selectedInfo" class="selected-info hidden">
+        <i class="fas fa-map-pin"></i> Viewing documents for: <span id="selectedLocation">-</span>
+      </div>
+      <div id="documentsContainer" style="display:none;">
+        <!-- Delete Mode Toggle -->
+        <div class="delete-mode-toggle">
+          <label>
+            <input type="checkbox" id="deleteModeToggle" onchange="toggleDeleteMode()">
+            <i class="fas fa-trash-alt"></i> Enable Delete Mode
+          </label>
+          <span style="font-size:0.7rem; color:#64748b;">(Check files to delete)</span>
+        </div>
+
+        <!-- Bulk Delete Bar -->
+        <div class="bulk-delete-bar" id="bulkDeleteBar">
+          <span class="selected-count" id="selectedCount">0 files selected</span>
+          <button class="bulk-delete-btn" id="bulkDeleteBtn" onclick="confirmBulkDelete()" disabled>
+            <i class="fas fa-trash-alt"></i> Delete Selected
+          </button>
+        </div>
+
+        <div class="drive-folder">
+          <div class="doc-header">
+            <h4><i class="fas fa-file-pdf"></i> CLUP Documents</h4>
+            <div class="upload-actions">
+              <button class="upload-btn" id="uploadClupBtn" onclick="triggerUpload('clup')">
+                <i class="fas fa-cloud-upload-alt"></i> Upload
+              </button>
+              <span id="clupUploadStatus" class="upload-status"></span>
+            </div>
+          </div>
+          <input type="file" id="clupFileInput" class="file-input-hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple onchange="handleFileUpload('clup', this)">
+          <ul class="drive-doc-list" id="clupDocList"><li>Select a province and LGU first</li></ul>
+        </div>
+
+        <div class="drive-folder">
+          <div class="doc-header">
+            <h4><i class="fas fa-gavel"></i> ZO Documents</h4>
+            <div class="upload-actions">
+              <button class="upload-btn" id="uploadZoBtn" onclick="triggerUpload('zo')">
+                <i class="fas fa-cloud-upload-alt"></i> Upload
+              </button>
+              <span id="zoUploadStatus" class="upload-status"></span>
+            </div>
+          </div>
+          <input type="file" id="zoFileInput" class="file-input-hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple onchange="handleFileUpload('zo', this)">
+          <ul class="drive-doc-list" id="zoDocList"><li>Select a province and LGU first</li></ul>
+        </div>
+
+        <div class="drive-folder">
+          <div class="doc-header">
+            <h4><i class="fas fa-folder"></i> Supporting Documents</h4>
+            <div class="upload-actions">
+              <button class="upload-btn" id="uploadSupportingBtn" onclick="triggerUpload('supporting')">
+                <i class="fas fa-cloud-upload-alt"></i> Upload
+              </button>
+              <span id="supportingUploadStatus" class="upload-status"></span>
+            </div>
+          </div>
+          <input type="file" id="supportingFileInput" class="file-input-hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx" multiple onchange="handleFileUpload('supporting', this)">
+          <ul class="drive-doc-list" id="supportingDocList"><li>Select a province and LGU first</li></ul>
+        </div>
+
+        <div class="google-drive-link" id="googleDriveLink" style="display:none;">
+          <p><i class="fas fa-folder"></i> <strong>Access Full Google Drive Folder:</strong></p>
+          <a href="https://drive.google.com/drive/folders/1arGRhomtDIU7seiDZajAO77L8noAQigV?usp=sharing" target="_blank" class="btn-drive" id="driveFolderLink">
+            <i class="fas fa-external-link-alt"></i> Open CLUP/ZO Google Drive Folder
+          </a>
+        </div>
+      </div>
+      <div id="requestFormContainer" style="display:none;">
+        <form id="documentRequestForm" onsubmit="return submitDocumentRequest(event)">
+          <div class="selector-group">
+            <label><i class="fas fa-file-alt"></i> Request Additional Document:</label>
+            <input type="text" placeholder="Enter document name you need" id="requestDocName">
+          </div>
+          <div class="selector-group">
+            <label><i class="fas fa-envelope"></i> Your Email Address:</label>
+            <input type="email" placeholder="Your email address" id="requestEmail">
+          </div>
+          <button type="submit" class="submit-doc-btn">
+            <i class="fas fa-paper-plane"></i> Request Document
+          </button>
+        </form>
+      </div>
+      <p class="note-text"><i class="fas fa-lightbulb"></i> Tip: First select a Province, then choose an LGU to view documents</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-close-modal" id="closeModalBtn2"><i class="fas fa-times"></i> Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FILE PREVIEW MODAL ===== -->
+<div id="filePreviewModal" class="file-preview-modal">
+  <div class="file-preview-content">
+    <span class="file-preview-close" onclick="closeFilePreview()">&times;</span>
+    <div class="file-preview-name" id="previewFileName">Loading...</div>
+    <div id="previewContent">
+      <div class="file-preview-loading"><i class="fas fa-spinner fa-spin"></i> Loading file preview...</div>
+    </div>
+    <div class="file-preview-actions">
+      <a href="#" target="_blank" id="previewDownloadLink"><i class="fas fa-download"></i> Download</a>
+      <a href="#" target="_blank" id="previewOpenLink"><i class="fas fa-external-link-alt"></i> Open in Drive</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOGIN MODAL (from indexGUI.html) ===== -->
+<div id="loginModal" class="login-modal">
+  <div class="login-modal-content">
+    <div class="login-modal-brand">
+      <button class="login-modal-close" onclick="closeLoginModal()">&times;</button>
+      <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+      <h3>DHSUD Region VI</h3>
+      <p>ELUPDD · CLUP & ZO Platform</p>
+    </div>
+    <div class="login-modal-body">
+      <form id="modalLoginForm">
+        <div class="input-group">
+          <label><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" id="modalLoginEmail" placeholder="name@dhsud.gov.ph" required />
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="modalLoginPassword" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="login-submit-btn" id="loginModalBtn">→ Sign In</button>
+      </form>
+    </div>
+    <div class="login-modal-footer">🔐 Role-Based Access: Admin | Staff/Officer</div>
+  </div>
+</div>
+
+<!-- ===== FOOTER (from indexGUI.html) ===== -->
+<footer class="footer-new">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img src="img/DHSUD_LOGO.png" alt="logo" class="logo-image" /><br />
+        <strong>DHSUD Region VI</strong><br />ELUPDD – CLUP & ZO Platform<br />Geospatial Innovation for Resilience
+      </div>
+      <div>
+        <strong>Our Social Networks</strong><br />Follow us for updates<br />
+        <div class="social-icons">
+          <a href="https://web.facebook.com/DHSUDR6" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook"></i></a>
+          <i class="fab fa-instagram"></i><i class="fab fa-twitter"></i>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2rem; border-top:1px solid #2d4f6e; padding-top:1rem">© 2026 DHSUD VI — ELUPDD</div>
+  </div>
+</footer>
+
+<script>
+// ============================================
+// TOAST NOTIFICATION SYSTEM (from indexGUI.html)
+// ============================================
+function showToast(title, message, type = 'info', duration = 4000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  const icons = {
+    success: 'fa-check-circle',
+    error: 'fa-times-circle',
+    warning: 'fa-exclamation-triangle',
+    info: 'fa-info-circle'
+  };
+  
+  toast.innerHTML = `
+    <div class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+  `;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+  
+  return toast;
+}
+
+// ============================================
+// CONFIGURATION
+// ============================================
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCYiLHesLAvoh6wV_gTQyTGYBwRqiBwDpiKiLsYHOntGVF2gW5NjWUS50YzoHaJmk/exec";
+const GOOGLE_SCRIPT_URL_UPLOAD = "https://script.google.com/macros/s/AKfycbwo4bJ6qkDy7HkB4IMRu4y1E0JKHgSF9IZFilJbjeNNUdYkIfg-iv7AuZB3p6vd9Q/exec";
+const DRIVE_FOLDER_ID = "1arGRhomtDIU7seiDZajAO77L8noAQigV";
+let currentUser = null;
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function escapeHtml(s) { if (!s) return ""; return String(s).replace(/[&<>]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;" })[m]); }
+function encodePassword(p) { return btoa(p); }
+
+// ============================================
+// SESSION MANAGEMENT (from indexGUI.html)
+// ============================================
+function checkSession() {
+  const raw = localStorage.getItem("dhsud_session");
+  if (raw) {
+    try {
+      const s = JSON.parse(raw);
+      const diff = (new Date() - new Date(s.loggedInAt)) / (1000 * 60 * 60);
+      if (diff < 12 && s.email) {
+        currentUser = s;
+        return true;
+      } else localStorage.removeItem("dhsud_session");
+    } catch(e) { localStorage.removeItem("dhsud_session"); }
+  }
+  currentUser = null;
+  return false;
+}
+
+function getUserInitials(n) { if (!n) return "U"; let p = n.split(" "); if (p.length >= 2) return (p[0][0] + p[1][0]).toUpperCase(); return n.substring(0,2).toUpperCase(); }
+function getRoleLabel(r) { if (r === "admin") return "👑 Admin"; if (r === "encoder" || r === "staff") return "📋 Staff/Officer"; return "👁️ Viewer"; }
+function getRoleClass(r) { if (r === "admin") return "admin"; if (r === "encoder" || r === "staff") return "staff"; return "viewer"; }
+
+// ============================================
+// RENDER NAVIGATION & USER MENU (from indexGUI.html)
+// ============================================
+function renderMainNavigation() {
+  const container = document.getElementById("mainNavContainer");
+  if (!container) return;
+  let navHtml = `<a href="index.html"><i class="fas fa-home"></i> Home</a>`;
+  if (currentUser) {
+    navHtml += `
+      <div class="dropdown">
+        <button class="dropbtn">Certification</button>
+        <div class="dropdown-content">
+          <a href="lc.html">Locational Clearance</a>
+          <a href="SZC.html">Site Zoning Certification</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn">Land Use Plans</button>
+        <div class="dropdown-content">
+          <div class="dropdown-submenu">
+            <button class="submenu-trigger">CLUP & ZO <span class="arrow-right">▸</span></button>
+            <div class="submenu-content">
+              <a href="inventory.html" class="active">Inventory</a>
+              <a href="status.html">Status</a>
+            </div>
+          </div>
+          <a href="status.html">PDPFP</a>
+        </div>
+      </div>
+      <a href="Techsamp.html"><i class="fas fa-headset"></i> Technical Assistance</a>
+      <a href="lgu-info.html"><i class="fas fa-city"></i> LGU Information</a>
+      <a href="report.html"><i class="fas fa-chart-pie"></i> Reports</a>
+      <a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a>
+      <a href="issuance.html"><i class="fas fa-file-alt"></i> Issuances</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    `;
+  } else {
+    navHtml += `<a href="#about">About</a><a href="#contact">Contact</a>`;
+  }
+  container.innerHTML = navHtml;
+  // Fix dropdown submenu hover
+  setTimeout(() => {
+    document.querySelectorAll(".dropdown-submenu .submenu-trigger").forEach((trigger) => {
+      trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const submenu = trigger.closest(".dropdown-submenu");
+        if (submenu) submenu.classList.toggle("open");
+      });
+    });
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".dropdown-submenu")) {
+        document.querySelectorAll(".dropdown-submenu.open").forEach((s) => s.classList.remove("open"));
+      }
+    });
+  }, 10);
+}
+
+function renderUserMenu() {
+  const container = document.getElementById("userMenuContainer");
+  if (!container) return;
+  if (currentUser) {
+    const initials = getUserInitials(currentUser.fullName);
+    const firstName = currentUser.fullName?.split(" ")[0] || "User";
+    const roleLabel = getRoleLabel(currentUser.role);
+    const roleClass = getRoleClass(currentUser.role);
+    container.innerHTML = `
+      <div class="user-menu" id="userMenuDropdown" style="position:relative;">
+        <div class="user-avatar">${initials}</div>
+        <span class="user-name">${escapeHtml(firstName)}</span>
+        <span class="role-badge-header ${roleClass}">${roleLabel}</span>
+        <span style="font-size:0.6rem;">▼</span>
+        <div class="user-dropdown-menu">
+          <div class="user-dropdown-item">👤 ${escapeHtml(currentUser.email)}</div>
+          <div class="user-dropdown-item">🏢 ${escapeHtml(currentUser.office || "ELUPDD")}</div>
+          ${currentUser.role === "admin" ? `<div class="user-dropdown-item" id="adminConsoleLink">⚙️ Manage Users</div>` : ""}
+          <div class="user-dropdown-item" id="logoutDropdownBtn" style="color:#dc2626;">🚪 Sign Out</div>
+        </div>
+      </div>
+    `;
+    const userDiv = document.getElementById("userMenuDropdown");
+    if (userDiv) {
+      userDiv.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const menu = userDiv.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = menu.style.display === "block" ? "none" : "block";
+      });
+      document.addEventListener("click", () => {
+        const menu = userDiv?.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = "none";
+      });
+    }
+    if (currentUser.role === "admin") {
+      const adminBtn = document.getElementById("adminConsoleLink");
+      if (adminBtn) adminBtn.addEventListener("click", () => (window.location.href = "admin.html"));
+    }
+    const logoutBtn = document.getElementById("logoutDropdownBtn");
+    if (logoutBtn) logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("dhsud_session");
+      showToast("Logged Out", "You have been logged out successfully.", "info");
+      setTimeout(() => { window.location.href = "inventory.html"; }, 700);
+    });
+  } else {
+    container.innerHTML = `<div class="login-prompt" onclick="openLoginModal()"><i class="fas fa-sign-in-alt"></i> Sign In</div>`;
+  }
+}
+
+// ============================================
+// LOGIN MODAL (from indexGUI.html)
+// ============================================
+function openLoginModal() {
+  document.getElementById("loginModal").classList.add("active");
+}
+function closeLoginModal() {
+  document.getElementById("loginModal").classList.remove("active");
+}
+async function handleModalLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById("modalLoginEmail").value.trim().toLowerCase();
+  const password = document.getElementById("modalLoginPassword").value;
+  const btn = document.getElementById("loginModalBtn");
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Authenticating...";
+  try {
+    const resp = await fetch(`${GOOGLE_SCRIPT_URL}?action=get&data_type=users&_=${Date.now()}`);
+    const users = await resp.json();
+    const user = users.find((u) => u.email?.toLowerCase() === email);
+    if (!user) { showToast("Authentication Failed", "Account not found.", "error"); btn.innerHTML = originalText; btn.disabled = false; return false; }
+    if (user.password === encodePassword(password)) {
+      const session = { userId: user.id, email: user.email, fullName: user.fullName, office: user.office || "ELUPDD", role: user.role, loggedInAt: new Date().toISOString() };
+      localStorage.setItem("dhsud_session", JSON.stringify(session));
+      showToast("Welcome", `Welcome ${user.fullName?.split(" ")[0] || ""}!`, "success");
+      closeLoginModal();
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showToast("Authentication Failed", "Invalid password.", "error");
+    }
+  } catch (error) {
+    showToast("Connection Error", "Please try again.", "error");
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+  return false;
+}
+
+// ============================================
+// MODAL CONTROLS
+// ============================================
+const modal = document.getElementById("documentModal");
+const hyperlinkBtn = document.getElementById("lguHyperlinkBtn");
+
+function openModal() {
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  modal.classList.remove("active");
+  document.body.style.overflow = "auto";
+}
+
+hyperlinkBtn.addEventListener("click", function(e) {
+  e.preventDefault();
+  openModal();
+  resetModalState();
+});
+
+document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+document.getElementById("closeModalBtn2").addEventListener("click", closeModal);
+window.addEventListener("click", function(e) {
+  if (e.target === modal) {
+    closeModal();
+  }
+});
+
+// ============================================
+// INVENTORY DATA
+// ============================================
+const provinceData = {
+  Aklan: {
+    lgus: ["Altavas","Balete","Banga","Batan","Buruanga","Ibajay","Kalibo","Lezo","Libacao","Madalag","Makato","Malay","Malinao","Nabas","New Washington","Numancia","Tangalan"],
+    driveFolder: "https://drive.google.com/drive/folders/1X3ko9XJe_aIF2v_0Qwf4kvpK4HSrePqo?usp=sharing"
+  },
+  Antique: {
+    lgus: ["Anini-y","Barbaza","Belison","Bugasong","Caluya","Culasi","Hamtic","Laua-an","Libertad","Pandan","Patnongon","San Jose","San Remigio","Sebaste","Sibalom","Tibiao","Tobias Fornier","Valderrama"],
+    driveFolder: "https://drive.google.com/drive/folders/1AntiqueFolder?usp=sharing"
+  },
+  Capiz: {
+    lgus: ["Cuartero","Dao","Dumalag","Dumarao","Ivisan","Jamindan","Ma-ayon","Mambusao","Panay","Panitan","Pilar","Pontevedra","President Roxas","Roxas City","Sapian","Sigma","Tapaz"],
+    driveFolder: "https://drive.google.com/drive/folders/1CapizFolder?usp=sharing"
+  },
+  Guimaras: {
+    lgus: ["Buenavista","Jordan","Nueva Valencia","San Lorenzo","Sibunag"],
+    driveFolder: "https://drive.google.com/drive/folders/1GuimarasFolder?usp=sharing"
+  },
+  Iloilo: {
+    lgus: ["Ajuy","Alimodian","Anilao","Badiangan","Balasan","Banate","Barotac Nuevo","Barotac Viejo","Batad","Bingawan","Cabatuan","Calinog","Carles","Concepcion","Dingle","Dueñas","Dumangas","Estancia","Guimbal","Igbaras","Iloilo City","Janiuay","Lambunao","Leganes","Lemery","Leon","Maasin","Miagao","Mina","New Lucena","Oton","Pavia","Pototan","San Dionisio","San Enrique","San Joaquin","San Miguel","San Rafael","Santa Barbara","Sara","Tigbauan","Tubungan","Zarraga"],
+    driveFolder: "https://drive.google.com/drive/folders/1IloiloFolder?usp=sharing"
+  }
+};
+
+// ============================================
+// UPLOADED FILES STORAGE
+// ============================================
+const uploadedFiles = {
+  clup: [],
+  zo: [],
+  supporting: []
+};
+
+let deleteModeEnabled = false;
+let selectedFiles = new Set();
+
+// ============================================
+// INVENTORY FUNCTIONS
+// ============================================
+function resetModalState() {
+  document.getElementById("provinceSelect").value = "";
+  document.getElementById("lguSelectorGroup").style.display = "none";
+  document.getElementById("documentsContainer").style.display = "none";
+  document.getElementById("requestFormContainer").style.display = "none";
+  document.getElementById("selectedInfo").classList.add("hidden");
+  document.getElementById("lguSelect").innerHTML = '<option value="">-- Select LGU --</option>';
+  document.querySelector(".modal-header h2").innerHTML = '<i class="fas fa-folder-open"></i> CLUP/ZO Documents Viewer';
+  uploadedFiles.clup = [];
+  uploadedFiles.zo = [];
+  uploadedFiles.supporting = [];
+}
+
+const provinceSelect = document.getElementById("provinceSelect");
+const lguSelect = document.getElementById("lguSelect");
+const lguSelectorGroup = document.getElementById("lguSelectorGroup");
+const documentsContainer = document.getElementById("documentsContainer");
+const requestFormContainer = document.getElementById("requestFormContainer");
+const selectedInfo = document.getElementById("selectedInfo");
+const selectedLocationSpan = document.getElementById("selectedLocation");
+
+provinceSelect.addEventListener("change", function() {
+  const p = this.value;
+  if (p === "") {
+    lguSelectorGroup.style.display = "none";
+    documentsContainer.style.display = "none";
+    requestFormContainer.style.display = "none";
+    selectedInfo.classList.add("hidden");
+    return;
+  }
+  lguSelectorGroup.style.display = "block";
+  lguSelect.innerHTML = '<option value="">-- Select LGU --</option>';
+  const lgus = provinceData[p]?.lgus || [];
+  lgus.forEach(l => {
+    const opt = document.createElement("option");
+    opt.value = l;
+    opt.textContent = `🏘️ ${l}`;
+    lguSelect.appendChild(opt);
+  });
+  document.querySelector(".modal-header h2").innerHTML = `<i class="fas fa-folder-open"></i> CLUP/ZO Documents - ${p} Province`;
+});
+
+lguSelect.addEventListener("change", function() {
+  const p = provinceSelect.value;
+  const l = this.value;
+  if (l === "") {
+    documentsContainer.style.display = "none";
+    requestFormContainer.style.display = "none";
+    selectedInfo.classList.add("hidden");
+    return;
+  }
+  documentsContainer.style.display = "block";
+  requestFormContainer.style.display = "block";
+  selectedInfo.classList.remove("hidden");
+  selectedLocationSpan.innerHTML = `${l}, ${p}`;
+  const driveFolderLink = document.getElementById("driveFolderLink");
+  const googleDriveLinkDiv = document.getElementById("googleDriveLink");
+  driveFolderLink.href = "https://drive.google.com/drive/folders/1arGRhomtDIU7seiDZajAO77L8noAQigV?usp=sharing";
+  googleDriveLinkDiv.style.display = "block";
+  
+  uploadedFiles.clup = [];
+  uploadedFiles.zo = [];
+  uploadedFiles.supporting = [];
+  
+  loadDocumentsForLGU(l);
+  
+  document.getElementById("uploadClupBtn").disabled = false;
+  document.getElementById("uploadZoBtn").disabled = false;
+  document.getElementById("uploadSupportingBtn").disabled = false;
+});
+
+async function loadDocumentsForLGU(lgu) {
+  const province = provinceSelect.value;
+  const folderName = `${province} - ${lgu}`;
+  
+  let folderId = null;
+  try {
+    const folderResponse = await fetch(`${GOOGLE_SCRIPT_URL_UPLOAD}?action=createFolder&folderName=${encodeURIComponent(folderName)}&parentFolderId=${DRIVE_FOLDER_ID}`);
+    const folderResult = await folderResponse.json();
+    if (folderResult.success) {
+      folderId = folderResult.folderId;
+    }
+  } catch (error) {
+    console.log('Could not get folder:', error);
+  }
+  
+  let driveFiles = [];
+  if (folderId) {
+    try {
+      const fileResponse = await fetch(`${GOOGLE_SCRIPT_URL_UPLOAD}?action=getFolderFiles&folderId=${encodeURIComponent(folderId)}`);
+      const fileResult = await fileResponse.json();
+      if (fileResult.success) {
+        driveFiles = fileResult.files || [];
+      }
+    } catch (error) {
+      console.log('Could not fetch files:', error);
+    }
+  }
+  
+  const clupDriveFiles = driveFiles.filter(f => f.name.includes('CLUP_'));
+  const zoDriveFiles = driveFiles.filter(f => f.name.includes('ZO_'));
+  const supportingDriveFiles = driveFiles.filter(f => !f.name.includes('CLUP_') && !f.name.includes('ZO_'));
+  
+  const clupList = document.getElementById("clupDocList");
+  let clupItems = [];
+  clupDriveFiles.forEach(f => {
+    clupItems.push({
+      name: f.name,
+      link: f.url,
+      isUploaded: true,
+      isStatic: false,
+      fileId: f.id
+    });
+  });
+  renderFileList(clupList, clupItems);
+  
+  const zoList = document.getElementById("zoDocList");
+  let zoItems = [];
+  zoDriveFiles.forEach(f => {
+    zoItems.push({
+      name: f.name,
+      link: f.url,
+      isUploaded: true,
+      isStatic: false,
+      fileId: f.id
+    });
+  });
+  renderFileList(zoList, zoItems);
+  
+  const supList = document.getElementById("supportingDocList");
+  let supItems = [];
+  supportingDriveFiles.forEach(f => {
+    supItems.push({
+      name: f.name,
+      link: f.url,
+      isUploaded: true,
+      isStatic: false,
+      fileId: f.id
+    });
+  });
+  renderFileList(supList, supItems);
+}
+
+function renderFileList(listElement, items) {
+  if (items.length === 0) {
+    listElement.innerHTML = '<li><span class="file-icon">📄</span> No documents available</li>';
+    return;
+  }
+  
+  listElement.innerHTML = items.map(item => {
+    let badge = '';
+    let deleteCheckbox = '';
+    
+    if (item.isUploaded && item.fileId) {
+      badge = ' <span style="font-size:0.6rem; color:#166534; background:#dcfce7; padding:2px 8px; border-radius:12px; margin-left:6px;">⬆ Uploaded</span>';
+      deleteCheckbox = `
+        <span class="delete-checkbox">
+          <input type="checkbox" onchange="toggleFileSelection('${item.fileId}', this)">
+        </span>
+      `;
+    }
+    
+    return `<li class="file-item">
+      ${deleteCheckbox}
+      <span class="file-info">
+        <span class="file-icon">📄</span>
+        <a href="javascript:void(0)" onclick="openFilePreview('${escapeHtml(item.name)}', '${item.link}')">${escapeHtml(item.name)}</a>
+        ${badge}
+        ${item.isUploaded && item.fileId ? `<button class="delete-btn visible" onclick="deleteSingleFile('${item.fileId}', '${escapeHtml(item.name)}', this)"><i class="fas fa-trash-alt"></i></button>` : ''}
+      </span>
+    </li>`;
+  }).join('');
+  
+  if (deleteModeEnabled) {
+    document.querySelectorAll('.delete-checkbox').forEach(el => {
+      el.classList.add('visible');
+    });
+    document.getElementById('bulkDeleteBar').classList.add('visible');
+  }
+}
+
+// ============================================
+// FILE PREVIEW FUNCTIONS
+// ============================================
+function openFilePreview(fileName, fileUrl) {
+  const modal = document.getElementById('filePreviewModal');
+  const nameEl = document.getElementById('previewFileName');
+  const contentEl = document.getElementById('previewContent');
+  const downloadLink = document.getElementById('previewDownloadLink');
+  const openLink = document.getElementById('previewOpenLink');
+  
+  nameEl.textContent = fileName;
+  downloadLink.href = fileUrl;
+  openLink.href = fileUrl;
+  
+  contentEl.innerHTML = '<div class="file-preview-loading"><i class="fas fa-spinner fa-spin"></i> Loading file preview...</div>';
+  modal.classList.add('active');
+  
+  const ext = fileName.split('.').pop().toLowerCase();
+  const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(ext);
+  const isPDF = ext === 'pdf';
+  const isDoc = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(ext);
+  
+  if (isImage) {
+    contentEl.innerHTML = `<img src="${fileUrl}" alt="${fileName}" onerror="this.style.display='none'; document.getElementById('previewError').style.display='block'">`;
+  } else if (isPDF) {
+    contentEl.innerHTML = `<iframe src="${fileUrl}" allowfullscreen></iframe>`;
+  } else if (isDoc) {
+    const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+    contentEl.innerHTML = `<iframe src="${viewerUrl}" allowfullscreen></iframe>`;
+  } else {
+    contentEl.innerHTML = `
+      <div style="text-align:center; padding: 40px;">
+        <div style="font-size: 4rem; margin-bottom: 20px;">📄</div>
+        <p style="color: #64748b;">This file type cannot be previewed directly.</p>
+        <p style="color: #64748b; margin-top: 8px;">Click "Open in Drive" to view or download.</p>
+      </div>
+    `;
+  }
+}
+
+function closeFilePreview() {
+  document.getElementById('filePreviewModal').classList.remove('active');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeFilePreview();
+  }
+});
+
+document.getElementById('filePreviewModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeFilePreview();
+  }
+});
+
+// ============================================
+// UPLOAD FUNCTIONS
+// ============================================
+function triggerUpload(type) {
+  const inputMap = {
+    'clup': 'clupFileInput',
+    'zo': 'zoFileInput',
+    'supporting': 'supportingFileInput'
+  };
+  document.getElementById(inputMap[type]).click();
+}
+
+async function handleFileUpload(type, input) {
+  const files = input.files;
+  if (!files || files.length === 0) return;
+  
+  const province = provinceSelect.value;
+  const lgu = lguSelect.value;
+  
+  if (!province || !lgu) {
+    showToast("Please select a Province and LGU first.", "error");
+    input.value = '';
+    return;
+  }
+  
+  const statusSpan = document.getElementById(`${type}UploadStatus`);
+  const uploadBtn = document.getElementById(`upload${type.charAt(0).toUpperCase() + type.slice(1)}Btn`);
+  
+  const folderName = `${province} - ${lgu}`;
+  let folderId;
+  
+  try {
+    statusSpan.innerHTML = `<span class="upload-progress"></span> Creating folder...`;
+    
+    const folderResponse = await fetch(`${GOOGLE_SCRIPT_URL_UPLOAD}?action=createFolder&folderName=${encodeURIComponent(folderName)}&parentFolderId=${DRIVE_FOLDER_ID}`);
+    const folderResult = await folderResponse.json();
+    
+    if (!folderResult.success) {
+      showToast("Failed to create folder: " + folderResult.error, "error");
+      statusSpan.innerHTML = '❌ Failed';
+      input.value = '';
+      return;
+    }
+    folderId = folderResult.folderId;
+    console.log("Folder ready:", folderId);
+    
+  } catch (error) {
+    console.error("Error:", error);
+    showToast("Error: " + error.message, "error");
+    statusSpan.innerHTML = '❌ Error';
+    input.value = '';
+    return;
+  }
+  
+  let uploadedCount = 0;
+  let failedCount = 0;
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    statusSpan.innerHTML = `<span class="upload-progress"></span> Uploading ${file.name} (${i+1}/${files.length})...`;
+    uploadBtn.disabled = true;
+    
+    try {
+      const result = await uploadFileDirect(file, folderId, province, lgu, type);
+      
+      if (result.success) {
+        uploadedCount++;
+        const fileInfo = { name: result.fileName || file.name, link: result.fileLink };
+        if (type === 'clup') {
+          uploadedFiles.clup.push(fileInfo);
+        } else if (type === 'zo') {
+          uploadedFiles.zo.push(fileInfo);
+        } else if (type === 'supporting') {
+          uploadedFiles.supporting.push(fileInfo);
+        }
+        showToast("✅ " + (result.fileName || file.name) + " uploaded!", "success");
+      } else {
+        failedCount++;
+        showToast("❌ " + file.name + ": " + (result.error || 'Upload failed'), "error");
+      }
+    } catch (error) {
+      failedCount++;
+      showToast("❌ " + file.name + ": " + error.message, "error");
+    }
+  }
+  
+  loadDocumentsForLGU(lgu);
+  
+  if (uploadedCount > 0 && failedCount === 0) {
+    statusSpan.innerHTML = `✅ ${uploadedCount} uploaded`;
+    showToast("✅ All " + uploadedCount + " file(s) uploaded successfully!", "success");
+  } else if (uploadedCount > 0 && failedCount > 0) {
+    statusSpan.innerHTML = `⚠️ ${uploadedCount} uploaded, ${failedCount} failed`;
+    showToast("⚠️ " + uploadedCount + " uploaded, " + failedCount + " failed", "error");
+  } else {
+    statusSpan.innerHTML = '❌ Upload failed';
+    showToast("❌ All " + files.length + " file(s) failed to upload", "error");
+  }
+  
+  uploadBtn.disabled = false;
+  input.value = '';
+}
+
+async function uploadFileDirect(file, folderId, province, lgu, docType) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      try {
+        const base64Data = e.target.result.split(',')[1];
+        const typeLabels = { 'clup': 'CLUP', 'zo': 'ZO', 'supporting': 'Supporting' };
+        const fileName = `${typeLabels[docType]}_${file.name}`;
+        
+        const formData = new FormData();
+        formData.append('action', 'upload');
+        formData.append('folderId', folderId);
+        formData.append('fileName', fileName);
+        formData.append('fileData', base64Data);
+        formData.append('mimeType', file.type || 'application/octet-stream');
+        formData.append('docType', docType);
+        formData.append('lgu', lgu);
+        formData.append('province', province);
+        
+        const response = await fetch(GOOGLE_SCRIPT_URL_UPLOAD, {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        let result;
+        try {
+          result = await response.json();
+        } catch (parseError) {
+          const text = await response.text();
+          console.log('Response text:', text);
+          throw new Error('Invalid JSON response: ' + text.substring(0, 200));
+        }
+        
+        console.log('Upload response:', result);
+        
+        if (result.success) {
+          resolve(result);
+        } else {
+          reject(new Error(result.error || 'Upload failed'));
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        reject(error);
+      }
+    };
+    reader.onerror = function(error) {
+      console.error('FileReader error:', error);
+      reject(error);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============================================
+// DELETE FUNCTIONS
+// ============================================
+function toggleDeleteMode() {
+  const checkbox = document.getElementById('deleteModeToggle');
+  deleteModeEnabled = checkbox.checked;
+  
+  document.querySelectorAll('.delete-checkbox').forEach(el => {
+    el.classList.toggle('visible', deleteModeEnabled);
+  });
+  
+  document.getElementById('bulkDeleteBar').classList.toggle('visible', deleteModeEnabled);
+  
+  if (!deleteModeEnabled) {
+    selectedFiles.clear();
+    updateSelectedCount();
+  }
+}
+
+function toggleFileSelection(fileId, checkbox) {
+  if (checkbox.checked) {
+    selectedFiles.add(fileId);
+  } else {
+    selectedFiles.delete(fileId);
+  }
+  updateSelectedCount();
+}
+
+function updateSelectedCount() {
+  const count = selectedFiles.size;
+  document.getElementById('selectedCount').textContent = `${count} file${count !== 1 ? 's' : ''} selected`;
+  document.getElementById('bulkDeleteBtn').disabled = count === 0;
+}
+
+async function confirmBulkDelete() {
+  if (selectedFiles.size === 0) {
+    showToast("No files selected for deletion.", "error");
+    return;
+  }
+  
+  const confirmDelete = confirm(`Are you sure you want to delete ${selectedFiles.size} file(s)? This action cannot be undone!`);
+  if (!confirmDelete) return;
+  
+  const bulkBtn = document.getElementById('bulkDeleteBtn');
+  bulkBtn.disabled = true;
+  bulkBtn.textContent = '⏳ Deleting...';
+  
+  let deleted = 0;
+  let failed = 0;
+  
+  for (const fileId of selectedFiles) {
+    try {
+      const result = await deleteFileFromDrive(fileId);
+      if (result.success) {
+        deleted++;
+      } else {
+        failed++;
+        console.error('Delete failed:', result.error);
+      }
+    } catch (error) {
+      failed++;
+      console.error('Delete error:', error);
+    }
+  }
+  
+  selectedFiles.clear();
+  updateSelectedCount();
+  
+  const lgu = lguSelect.value;
+  if (lgu) {
+    await loadDocumentsForLGU(lgu);
+  }
+  
+  bulkBtn.textContent = '🗑️ Delete Selected';
+  bulkBtn.disabled = false;
+  
+  if (deleted > 0 && failed === 0) {
+    showToast("✅ " + deleted + " file(s) deleted successfully!", "success");
+  } else if (deleted > 0 && failed > 0) {
+    showToast("⚠️ " + deleted + " deleted, " + failed + " failed", "error");
+  } else {
+    showToast("❌ Failed to delete " + failed + " file(s)", "error");
+  }
+}
+
+async function deleteFileFromDrive(fileId) {
+  try {
+    const response = await fetch(`${GOOGLE_SCRIPT_URL_UPLOAD}?action=deleteFile&fileId=${encodeURIComponent(fileId)}`);
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Delete error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+async function deleteSingleFile(fileId, fileName, element) {
+  const confirmDelete = confirm(`Are you sure you want to delete "${fileName}"?`);
+  if (!confirmDelete) return;
+  
+  const parentLi = element.closest('li');
+  parentLi.classList.add('deleting');
+  
+  try {
+    const result = await deleteFileFromDrive(fileId);
+    if (result.success) {
+      showToast("✅ \"" + fileName + "\" deleted successfully!", "success");
+      const lgu = lguSelect.value;
+      if (lgu) {
+        await loadDocumentsForLGU(lgu);
+      }
+    } else {
+      showToast("❌ Failed to delete: " + result.error, "error");
+      parentLi.classList.remove('deleting');
+    }
+  } catch (error) {
+    showToast("❌ Error: " + error.message, "error");
+    parentLi.classList.remove('deleting');
+  }
+}
+
+// ============================================
+// DOCUMENT REQUEST
+// ============================================
+function submitDocumentRequest(e) {
+  e.preventDefault();
+  const docName = document.getElementById('requestDocName').value.trim();
+  const email = document.getElementById('requestEmail').value.trim();
+  
+  if (!docName) {
+    showToast("Please enter a document name.", "error");
+    return;
+  }
+  if (!email) {
+    showToast("Please enter your email address.", "error");
+    return;
+  }
+  
+  showToast("📧 Request sent! We'll contact you at " + email, "success");
+  document.getElementById('requestDocName').value = '';
+  document.getElementById('requestEmail').value = '';
+  return false;
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+function init() {
+  checkSession();
+  renderMainNavigation();
+  renderUserMenu();
+  console.log('Inventory page initialized!');
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("modalLoginForm");
+  if (form) form.addEventListener("submit", handleModalLogin);
+  init();
+});
+
+// Expose functions globally
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
+window.openFilePreview = openFilePreview;
+window.closeFilePreview = closeFilePreview;
+window.triggerUpload = triggerUpload;
+window.handleFileUpload = handleFileUpload;
+window.toggleDeleteMode = toggleDeleteMode;
+window.toggleFileSelection = toggleFileSelection;
+window.confirmBulkDelete = confirmBulkDelete;
+window.deleteSingleFile = deleteSingleFile;
+</script>
+</body>
+</html>

@@ -1,0 +1,2250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DHSUD VI | ELUPDD - LGU Information Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* ===== BASE STYLES (from index.html) ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", "Segoe UI", Roboto, sans-serif; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 1.5rem 1.5rem 2rem;
+      background: #f4f7fc;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(26, 115, 232, 0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, rgba(0, 200, 150, 0.06) 0%, transparent 60%),
+                  linear-gradient(145deg, #f0f4f8 0%, #e8edf3 100%);
+      z-index: 0;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== ANIMATIONS (from index.html) ===== */
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(25px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+      0% { opacity: 0; transform: translateX(-40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      0% { opacity: 0; transform: translateX(40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+    .animate-fadeUp { animation: fadeUp 0.7s ease forwards; }
+    .animate-slideLeft { animation: slideInLeft 0.6s ease forwards; }
+    .animate-slideRight { animation: slideInRight 0.6s ease forwards; }
+
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== HEADER / NAVIGATION (from index.html) ===== */
+    .app-header {
+      width: 100%;
+      max-width: 1280px;
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: white;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      position: relative;
+      z-index: 5;
+    }
+    .app-header .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .app-header .brand img {
+      height: 42px;
+      width: auto;
+      display: block;
+      border-radius: 8px;
+    }
+    .app-header .brand span {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #1e3a8a;
+      letter-spacing: -0.3px;
+    }
+    .app-header .brand small {
+      font-weight: 400;
+      font-size: 0.6rem;
+      color: #64748b;
+      display: block;
+      margin-top: -2px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Navigation links - center */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      flex: 1;
+      justify-content: center;
+    }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-decoration: none;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .nav-links a i { font-size: 0.8rem; }
+    .nav-links a:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .nav-links a.active {
+      background: #1e3a8a;
+      color: white;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+    .nav-links a.active:hover {
+      background: #2563eb;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropbtn {
+      background: none;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+    .dropbtn:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: white;
+      min-width: 210px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      z-index: 1000;
+      top: 36px;
+      left: 0;
+      border: 1px solid #eef2ff;
+      padding: 0.3rem 0;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 0.6rem 1.2rem;
+      color: #1e293b;
+      font-size: 0.75rem;
+      text-decoration: none;
+      border: none;
+      background: none;
+      border-radius: 0;
+    }
+    .dropdown-content a:hover {
+      background: #eff6ff;
+    }
+    .dropdown-submenu {
+      position: relative;
+    }
+    .submenu-trigger {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: inherit;
+    }
+    .submenu-trigger:hover { background: #eff6ff; }
+    .arrow-right { font-size: 0.7rem; margin-left: 1rem; }
+    .submenu-content {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: white;
+      min-width: 170px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      border: 1px solid #eef2ff;
+      z-index: 1001;
+      padding: 0.3rem 0;
+    }
+    .dropdown-submenu:hover .submenu-content {
+      display: block;
+    }
+    .submenu-content a { padding: 0.6rem 1.2rem; }
+    .dropbtn::after {
+      content: " ▾";
+      font-size: 0.6rem;
+      opacity: 0.6;
+    }
+    .dropdown:hover .dropbtn::after {
+      opacity: 1;
+    }
+
+    /* User menu - right side */
+    .user-menu-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.15rem 0.5rem 0.15rem 0.7rem;
+      border-radius: 60px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .user-menu:hover { background: #e2e8f0; }
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      background: #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .user-name {
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    .role-badge-header {
+      background: #e2e8f0;
+      padding: 0.1rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.55rem;
+      font-weight: 600;
+    }
+    .role-badge-header.admin { background: #dcfce7; color: #166534; }
+    .role-badge-header.staff { background: #dbeafe; color: #1e40af; }
+    .user-dropdown-menu {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: white;
+      border-radius: 20px;
+      min-width: 180px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+      border: 1px solid #eef2ff;
+      overflow: hidden;
+      display: none;
+      z-index: 200;
+    }
+    .user-dropdown-item {
+      padding: 0.7rem 1.2rem;
+      border-bottom: 1px solid #f1f5f9;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .user-dropdown-item:hover { background: #f8fafc; }
+    .login-prompt {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.2rem 0.8rem 0.2rem 1rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #1e3a8a;
+    }
+    .login-prompt:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* ===== TOAST NOTIFICATIONS (from index.html) ===== */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      width: 100%;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transform: translateX(120%);
+      animation: slideIn 0.5s ease forwards;
+      border-left: 5px solid #2563eb;
+      min-height: 60px;
+    }
+    .toast.hiding { animation: slideOut 0.4s ease forwards; }
+    .toast-success { border-left-color: #10b981; }
+    .toast-error { border-left-color: #ef4444; }
+    .toast-info { border-left-color: #2563eb; }
+    .toast-warning { border-left-color: #f59e0b; }
+
+    .toast-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .toast-success .toast-icon { background: #d1fae5; color: #059669; }
+    .toast-error .toast-icon { background: #fee2e2; color: #dc2626; }
+    .toast-info .toast-icon { background: #dbeafe; color: #2563eb; }
+    .toast-warning .toast-icon { background: #fef3c7; color: #d97706; }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 0.9rem; color: #0f172a; }
+    .toast-message { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+    .toast-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+    .toast-close:hover { color: #475569; }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(120%); opacity: 0; }
+    }
+
+    /* ===== HERO (from index.html) ===== */
+    .hero-innovations {
+      background: white;
+      border-radius: 28px;
+      margin: 0 0 2rem 0;
+      padding: 2.5rem 3rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .innov-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .innov-text { flex: 1.2; }
+    .innov-text h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0f2b3a, #1e4a76);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.8rem;
+    }
+    .innov-text p {
+      font-size: 0.95rem;
+      color: #2c4c6e;
+      margin-bottom: 1.5rem;
+      max-width: 90%;
+    }
+    .platform-badges {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .badge-pill {
+      background: #f1f5f9;
+      border-radius: 60px;
+      padding: 0.2rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .badge-pill:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+    }
+    .badge-pill i { margin-right: 4px; }
+    .innov-image { flex: 0.8; text-align: center; animation: float 4s ease-in-out infinite; }
+    .innov-image img {
+      max-width: 100%;
+      border-radius: 24px;
+      background: white;
+      padding: 0.6rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    /* ===== SECTION HEADER (from index.html) ===== */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+      border-left: 6px solid #2563eb;
+      padding-left: 1rem;
+    }
+    .section-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0f2b3a;
+    }
+    .section-header h2 i { color: #2563eb; margin-right: 8px; }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      background: white;
+      border-radius: 28px;
+      padding: 2.5rem 3rem;
+      margin-bottom: 2rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 0.5rem;
+    }
+    .page-header h1 i { color: #2563eb; }
+    .page-header p {
+      color: #64748b;
+      font-size: 1rem;
+    }
+
+    /* ===== ACTION BAR ===== */
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .action-bar .stats-badge {
+      background: #eef2ff;
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* ===== BUTTONS (from index.html) ===== */
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      font-family: inherit;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -8px #2563eb70;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #cbd5e1;
+      color: #475569;
+      padding: 0.7rem 1.5rem;
+      border-radius: 40px;
+      font-weight: 600;
+      transition: 0.2s;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      transform: translateY(-2px);
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+      transform: translateY(-2px);
+    }
+    .btn-success {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-success:hover {
+      background: #059669;
+      transform: translateY(-2px);
+    }
+
+    /* ===== SEARCH/FILTER ROW ===== */
+    .search-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: white;
+      padding: 1.2rem 1.5rem;
+      border-radius: 24px;
+      margin-bottom: 2rem;
+      border: 1px solid #e2e8f0;
+      align-items: flex-end;
+    }
+    .search-group {
+      flex: 2;
+      min-width: 200px;
+    }
+    .filter-group {
+      flex: 1;
+      min-width: 180px;
+    }
+    .search-group label,
+    .filter-group label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #1e3a8a;
+      display: block;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.3px;
+    }
+    .search-group input,
+    .filter-group select {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      font-family: "Inter", sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.25s ease;
+      outline: none;
+      background: white;
+    }
+    .search-group input:focus,
+    .filter-group select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    /* ===== LGU LIST ===== */
+    .lgu-list-container {
+      background: white;
+      border-radius: 24px;
+      padding: 1.5rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    .lgu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .lgu-card-item {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+      border: 1px solid #eef2ff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      transition: 0.2s;
+    }
+    .lgu-card-item:hover {
+      background: #f1f5f9;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-color: #2563eb;
+    }
+    .lgu-info-summary h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+    .lgu-info-summary p {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 0.2rem;
+    }
+    .lgu-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .view-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.75rem;
+      transition: 0.2s;
+    }
+    .view-btn:hover {
+      background: #1e3a8a;
+      transform: translateY(-2px);
+    }
+
+    /* ===== MODAL (from index.html) ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-box {
+      background: white;
+      border-radius: 24px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      border-radius: 24px 24px 0 0;
+    }
+    .modal-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-header h2 i { color: white; }
+    .modal-header .close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .modal-header .close-btn:hover {
+      background: rgba(255,255,255,0.4);
+      transform: rotate(90deg);
+    }
+    .modal-body {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-footer {
+      padding: 1rem 2rem;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: #f8fafc;
+      border-radius: 0 0 24px 24px;
+    }
+    .modal-footer .btn-close-modal {
+      background: #2563eb;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85rem;
+    }
+    .modal-footer .btn-close-modal:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    /* ===== FORM STYLES (from index.html) ===== */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem 1.8rem;
+    }
+    .full-width { grid-column: 1 / -1; }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .field-group label {
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .field-group label i {
+      color: #2563eb;
+      font-size: 0.75rem;
+      width: 16px;
+    }
+    .field-group label .required {
+      color: #dc2626;
+      font-size: 0.6rem;
+    }
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 0.75rem 1.1rem;
+      font-size: 0.9rem;
+      transition: all 0.25s ease;
+      outline: none;
+      width: 100%;
+      color: #0f172a;
+      font-weight: 400;
+      font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    }
+    .field-group input:focus,
+    .field-group select:focus,
+    .field-group textarea:focus {
+      border-color: #2563eb;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .field-group input[readonly] {
+      background: #f1f5f9;
+      cursor: not-allowed;
+      color: #475569;
+    }
+    .field-group textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .field-group select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23475569' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      cursor: pointer;
+      color: #0f172a;
+      min-height: 50px;
+    }
+
+    /* ===== INFO ROWS ===== */
+    .info-row {
+      display: flex;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .info-label {
+      width: 180px;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .info-value {
+      flex: 1;
+      font-size: 0.85rem;
+      color: #0f172a;
+    }
+
+    /* ===== INLINE EDIT PANEL ===== */
+    .inline-edit-panel {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid #2563eb;
+    }
+    .inline-edit-panel h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 1rem;
+    }
+
+    /* ===== STATUS BADGES ===== */
+    .status-badge {
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .status-updated { background: #dcfce7; color: #166534; }
+    .status-for-updating { background: #fef3c7; color: #92400e; }
+    .status-under-review { background: #dbeafe; color: #1e40af; }
+    .status-conducted { background: #dcfce7; color: #166534; }
+    .status-non-conducted { background: #fef2f2; color: #991b1b; }
+
+    /* ===== LOGIN MODAL (from index.html) ===== */
+    .login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .login-modal.active { display: flex; }
+    .login-modal-content {
+      background: white;
+      border-radius: 2.5rem;
+      max-width: 440px;
+      width: 92%;
+      overflow: hidden;
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.4);
+      animation: fadeUp 0.3s ease;
+    }
+    .login-modal-brand {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+    .login-modal-brand img {
+      width: 110px;
+      height: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      display: inline-block;
+      margin-bottom: 0.6rem;
+    }
+    .login-modal-brand h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.1rem; }
+    .login-modal-brand p { font-size: 0.7rem; opacity: 0.85; }
+    .login-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: 0.2s;
+    }
+    .login-modal-close:hover { opacity: 1; transform: scale(1.1); }
+    .login-modal-body { padding: 1.8rem 1.8rem 1.2rem; }
+    .login-modal-body .input-group { margin-bottom: 1rem; }
+    .login-modal-body .input-group label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #54708f;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.3px;
+    }
+    .login-modal-body .input-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .login-modal-body .input-group input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .login-submit-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 1.2rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .login-submit-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .login-submit-btn:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+    .login-modal-footer {
+      text-align: center;
+      font-size: 0.6rem;
+      color: #94a3b8;
+      padding: 0.4rem 0 1rem;
+      border-top: 1px solid #eef2ff;
+      margin: 0 1.8rem;
+    }
+
+    /* ===== FOOTER (from index.html) ===== */
+    .footer-new {
+      background: #0a2540;
+      color: #b9d0e7;
+      padding: 2rem 0;
+      margin-top: 3rem;
+      border-top: 1px solid #2d4f6e;
+      width: 100%;
+    }
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .social-icons i {
+      font-size: 1.6rem;
+      margin-right: 0.8rem;
+      color: white;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .social-icons i:hover {
+      transform: translateY(-4px);
+      color: #3b82f6;
+    }
+    .footer-new .logo-image {
+      height: 40px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      margin-bottom: 12px;
+    }
+
+    /* ===== RESPONSIVE (from index.html) ===== */
+    @media (max-width: 1024px) {
+      .app-header { flex-wrap: wrap; gap: 0.5rem; padding: 0.6rem 1rem; }
+      .nav-links { flex: 1 1 100%; justify-content: center; order: 2; }
+      .user-menu-section { order: 3; justify-content: center; width: 100%; }
+      .brand { order: 1; }
+    }
+    @media (max-width: 800px) {
+      .app-header { flex-direction: column; align-items: stretch; padding: 0.6rem 1rem; }
+      .nav-links { flex-wrap: wrap; justify-content: center; order: 2; }
+      .user-menu-section { justify-content: center; margin-top: 0.3rem; order: 3; width: 100%; }
+      .brand { order: 1; justify-content: center; }
+      .hero-innovations { padding: 1.5rem; }
+      .innov-grid { flex-direction: column; }
+      .innov-text p { max-width: 100%; }
+      .innov-image { flex: 1; }
+      .page-header { padding: 1.5rem; }
+      .page-header h1 { font-size: 1.5rem; }
+      .action-bar { flex-direction: column; align-items: stretch; }
+      .search-filter-row { flex-direction: column; }
+      .lgu-card-item { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+      .lgu-actions { justify-content: flex-start; }
+      .form-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+      .full-width { grid-column: 1; }
+      .modal-box { max-width: 100%; margin: 0.5rem; }
+      .modal-body { padding: 1rem; }
+      .login-modal-brand img { width: 90px; }
+      .brand span { font-size: 0.9rem; }
+      .brand img { height: 34px; }
+      .info-label { width: 120px; }
+    }
+    @media (max-width: 500px) {
+      .container { padding: 0 12px; }
+      .hero-innovations { padding: 1rem; margin: 1rem 0; }
+      .innov-text h1 { font-size: 1.6rem; }
+      .page-header h1 { font-size: 1.2rem; }
+      .lgu-list-container { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== HEADER (from index.html) ===== -->
+<div class="app-header">
+  <div class="brand">
+    <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+    <div>
+      <span>DHSUD VI - ELUPDD</span>
+      <small>CLUP & ZO Integrated System</small>
+    </div>
+  </div>
+  <div class="nav-links" id="mainNavContainer">
+    <!-- Dynamically rendered -->
+  </div>
+  <div class="user-menu-section" id="userMenuContainer">
+    <!-- Dynamically rendered -->
+  </div>
+</div>
+
+<main>
+  <div class="container">
+    <!-- ===== HERO (from index.html) ===== -->
+    <div class="hero-innovations">
+      <div class="innov-grid">
+        <div class="innov-text">
+          <h1>LGU Information Management</h1>
+          <p>Comprehensive database of Local Government Units in Western Visayas. Manage LGU profiles, track CLUP status, and monitor planning activities.</p>
+          <div class="platform-badges">
+            <span class="badge-pill"><i class="fas fa-city"></i> All LGUs</span>
+            <span class="badge-pill"><i class="fas fa-file-alt"></i> CLUP Status</span>
+            <span class="badge-pill"><i class="fas fa-chart-line"></i> Monitoring</span>
+            <span class="badge-pill"><i class="fas fa-sync-alt"></i> Auto-Sync</span>
+          </div>
+        </div>
+        <div class="innov-image">
+          <img src="img/ELUPDD.png" alt="ELUPDD Official Logo" onerror="this.style.display='none'" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ACTION BAR ===== -->
+    <div class="action-bar">
+      <div>
+        <button class="btn-primary" onclick="showLGURegModal()"><i class="fas fa-plus"></i> Register New LGU</button>
+        <button class="btn-outline" onclick="syncAllToSheet()" style="margin-left:0.5rem;"><i class="fas fa-sync-alt"></i> Sync to Google Sheets</button>
+      </div>
+      <div class="stats-badge" id="totalCountStat"><i class="fas fa-database"></i> Total LGUs: 0</div>
+    </div>
+
+    <!-- ===== SEARCH/FILTER ===== -->
+    <div class="search-filter-row">
+      <div class="search-group">
+        <label><i class="fas fa-search"></i> SEARCH</label>
+        <input type="text" id="globalSearch" placeholder="Municipality, Mayor, MPDC, Email...">
+      </div>
+      <div class="filter-group">
+        <label><i class="fas fa-filter"></i> FILTER BY PROVINCE</label>
+        <select id="provinceFilter"><option value="">All Provinces</option></select>
+      </div>
+      <div>
+        <button class="btn-primary" id="applyFilterBtn" style="padding:0.7rem 1.8rem;"><i class="fas fa-check"></i> Apply Filter</button>
+      </div>
+    </div>
+
+    <!-- ===== LGU LIST ===== -->
+    <div class="lgu-list-container" id="lguListContainer">
+      <div id="lguGrid" class="lgu-grid">
+        <div style="text-align:center;padding:2rem;color:#94a3b8;">
+          <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+          <p style="margin-top:0.5rem;">Loading LGUs from database...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== REGISTRATION MODAL ===== -->
+<div id="lguModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2><i class="fas fa-city"></i> Register New LGU</h2>
+      <button class="close-btn" onclick="closeModal('lguModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="lguRegForm">
+        <div class="form-grid">
+          <div class="field-group">
+            <label><i class="fas fa-hashtag"></i> PSGC</label>
+            <input type="text" id="regPsgc" readonly placeholder="Auto-generated">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-map-pin"></i> Region <span class="required">*</span></label>
+            <input type="text" id="regRegion" value="REGION VI (WESTERN VISAYAS)" readonly>
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-landmark"></i> Province <span class="required">*</span></label>
+            <select id="regProvince" required>
+              <option value="">-- Select Province --</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-city"></i> City/Municipality <span class="required">*</span></label>
+            <select id="regMunicipality" required>
+              <option value="">-- Select City/Municipality --</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-tag"></i> Income Class <span class="required">*</span></label>
+            <select id="regIncomeClass" required>
+              <option value="">-- Select --</option>
+              <option value="1ST">1ST</option>
+              <option value="2ND">2ND</option>
+              <option value="3RD">3RD</option>
+              <option value="4TH">4TH</option>
+              <option value="5TH">5TH</option>
+              <option value="6TH">6TH</option>
+              <option value="N/A">N/A</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-user-tie"></i> Local Chief Executive <span class="required">*</span></label>
+            <input type="text" id="regMayor" required>
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-user"></i> Vice Governor/Mayor</label>
+            <input type="text" id="regViceMayor">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-envelope"></i> LGU Email</label>
+            <input type="email" id="regEmail">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-phone"></i> LGU Landline</label>
+            <input type="text" id="regLandline">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-user-cog"></i> C/M/PPDC <span class="required">*</span></label>
+            <input type="text" id="regMpdc" required>
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-envelope"></i> MPDC Email</label>
+            <input type="email" id="regMpdcEmail">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-phone"></i> MPDC Mobile</label>
+            <input type="text" id="regMpdcMobile">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-calendar-alt"></i> Planning Period</label>
+            <input type="text" id="regPlanningPeriod" placeholder="e.g., 2020-2029">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-file-alt"></i> CLUP Status <span class="required">*</span></label>
+            <select id="regClupStatus" required>
+              <option value="">-- Select --</option>
+              <option value="Updated">Updated</option>
+              <option value="For Updating">For Updating</option>
+              <option value="Under Review">Under Review</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-table"></i> Table Monitoring</label>
+            <select id="regTableMonitoring">
+              <option value="">-- Select --</option>
+              <option value="Conducted">Conducted</option>
+              <option value="Non-Conducted">Non-Conducted</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-clipboard-check"></i> Field Monitoring</label>
+            <select id="regFieldMonitoring">
+              <option value="">-- Select --</option>
+              <option value="Conducted">Conducted</option>
+              <option value="Non-Conducted">Non-Conducted</option>
+            </select>
+          </div>
+          <div class="field-group full-width">
+            <label><i class="fas fa-tasks"></i> Recent Activities</label>
+            <textarea id="regRecentActivities" rows="3" placeholder="Describe recent activities..."></textarea>
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-hands-helping"></i> TA Needs</label>
+            <input type="text" id="regTaNeeds" placeholder="Technical Assistance needs">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-calendar-alt"></i> Date Updated</label>
+            <input type="date" id="regDateUpdated">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-comment"></i> Remarks</label>
+            <input type="text" id="regRemarks">
+          </div>
+          <div class="field-group">
+            <label><i class="fas fa-sms"></i> Contacted (Text/Call)</label>
+            <select id="regContactedText">
+              <option value="">-- Select --</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label><i class="fab fa-facebook-messenger"></i> Contacted (FB)</label>
+            <select id="regContactedFb">
+              <option value="">-- Select --</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex; gap:1rem; margin-top:1.5rem; justify-content:flex-end; flex-wrap:wrap;">
+          <button type="submit" class="btn-primary" id="saveLGUBtn"><i class="fas fa-save"></i> Save LGU</button>
+          <button type="button" class="btn-outline" onclick="closeModal('lguModal')"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VIEW MODAL ===== -->
+<div id="viewModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2><i class="fas fa-info-circle"></i> LGU Full Details</h2>
+      <button class="close-btn" onclick="closeModal('viewModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="viewContent"></div>
+    <div class="modal-footer">
+      <button class="btn-close-modal" onclick="closeModal('viewModal')"><i class="fas fa-times"></i> Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOGIN MODAL (from index.html) ===== -->
+<div id="loginModal" class="login-modal">
+  <div class="login-modal-content">
+    <div class="login-modal-brand">
+      <button class="login-modal-close" onclick="closeLoginModal()">&times;</button>
+      <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+      <h3>DHSUD Region VI</h3>
+      <p>ELUPDD · CLUP & ZO Platform</p>
+    </div>
+    <div class="login-modal-body">
+      <form id="modalLoginForm">
+        <div class="input-group">
+          <label><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" id="modalLoginEmail" placeholder="name@dhsud.gov.ph" required />
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="modalLoginPassword" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="login-submit-btn" id="loginModalBtn">→ Sign In</button>
+      </form>
+    </div>
+    <div class="login-modal-footer">🔐 Role-Based Access: Admin | Staff/Officer</div>
+  </div>
+</div>
+
+<!-- ===== FOOTER (from index.html) ===== -->
+<footer class="footer-new">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img src="img/DHSUD_LOGO.png" alt="logo" class="logo-image" /><br />
+        <strong>DHSUD Region VI</strong><br />ELUPDD – CLUP & ZO Platform<br />Geospatial Innovation for Resilience
+      </div>
+      <div>
+        <strong>Our Social Networks</strong><br />Follow us for updates<br />
+        <div class="social-icons">
+          <a href="https://web.facebook.com/DHSUDR6" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook"></i></a>
+          <i class="fab fa-instagram"></i><i class="fab fa-twitter"></i>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2rem; border-top:1px solid #2d4f6e; padding-top:1rem">© 2026 DHSUD VI — ELUPDD</div>
+  </div>
+</footer>
+
+<script>
+// ============================================
+// TOAST NOTIFICATION SYSTEM (from index.html)
+// ============================================
+function showToast(title, message, type = 'info', duration = 4000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  const icons = {
+    success: 'fa-check-circle',
+    error: 'fa-times-circle',
+    warning: 'fa-exclamation-triangle',
+    info: 'fa-info-circle'
+  };
+  
+  toast.innerHTML = `
+    <div class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+  `;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+  
+  return toast;
+}
+
+// ============================================
+// CONFIGURATION
+// ============================================
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCYiLHesLAvoh6wV_gTQyTGYBwRqiBwDpiKiLsYHOntGVF2gW5NjWUS50YzoHaJmk/exec";
+const GOOGLE_SCRIPT_URL_LGU = "https://script.google.com/macros/s/AKfycbwo4bJ6qkDy7HkB4IMRu4y1E0JKHgSF9IZFilJbjeNNUdYkIfg-iv7AuZB3p6vd9Q/exec";
+let currentUser = null;
+let lguDatabase = [];
+let isSaving = false;
+let isSyncing = false;
+
+// ============================================
+// PSGC DATA
+// ============================================
+const PSGC_DATA = {
+  "Altavas": "600401000", "Balete": "600402000", "Banga": "600403000", "Batan": "600404000",
+  "Buruanga": "600405000", "Ibajay": "600406000", "Kalibo": "600407000", "Lezo": "600408000",
+  "Libacao": "600409000", "Madalag": "600410000", "Makato": "600411000", "Malay": "600412000",
+  "Malinao": "600413000", "Nabas": "600414000", "New Washington": "600415000", "Numancia": "600416000",
+  "Tangalan": "600417000", "Anini-y": "600601000", "Barbaza": "600602000", "Belison": "600603000",
+  "Bugasong": "600604000", "Caluya": "600605000", "Culasi": "600606000", "Tobias Fornier": "600607000",
+  "Hamtic": "600608000", "Laua-an": "600609000", "Libertad": "600610000", "Pandan": "600611000",
+  "Patnongon": "600612000", "San Jose": "600613000", "San Remigio": "600614000", "Sebaste": "600615000",
+  "Sibalom": "600616000", "Tibiao": "600617000", "Valderrama": "600618000", "Cuartero": "601901000",
+  "Dao": "601902000", "Dumalag": "601903000", "Dumarao": "601904000", "Ivisan": "601905000",
+  "Jamindan": "601906000", "Ma-ayon": "601907000", "Mambusao": "601908000", "Panay": "601909000",
+  "Panitan": "601910000", "Pilar": "601911000", "Pontevedra": "601912000", "President Roxas": "601913000",
+  "City of Roxas": "601914000", "Sapi-an": "601915000", "Sigma": "601916000", "Tapaz": "601917000",
+  "Ajuy": "603001000", "Alimodian": "603002000", "Anilao": "603003000", "Badiangan": "603004000",
+  "Balasan": "603005000", "Banate": "603006000", "Barotac Nuevo": "603007000", "Barotac Viejo": "603008000",
+  "Batad": "603009000", "Bingawan": "603010000", "Cabatuan": "603012000", "Calinog": "603013000",
+  "Carles": "603014000", "Concepcion": "603015000", "Dingle": "603016000", "Dueñas": "603017000",
+  "Dumangas": "603018000", "Estancia": "603019000", "Guimbal": "603020000", "Igbaras": "603021000",
+  "Janiuay": "603023000", "Lambunao": "603025000", "Leganes": "603026000", "Lemery": "603027000",
+  "Leon": "603028000", "Maasin": "603029000", "Miagao": "603030000", "Mina": "603031000",
+  "New Lucena": "603032000", "Oton": "603034000", "City of Passi": "603035000", "Pavia": "603036000",
+  "Pototan": "603037000", "San Dionisio": "603038000", "San Enrique": "603039000", "San Joaquin": "603040000",
+  "San Miguel": "603041000", "San Rafael": "603042000", "Santa Barbara": "603043000", "Sara": "603044000",
+  "Tigbauan": "603045000", "Tubungan": "603046000", "Zarraga": "603047000", "Buenavista": "607901000",
+  "Jordan": "607902000", "Nueva Valencia": "607903000", "San Lorenzo": "607904000", "Sibunag": "607905000",
+  "City of Iloilo": "631000000"
+};
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function escapeHtml(s) { if (!s) return ""; return String(s).replace(/[&<>]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;" })[m]); }
+function encodePassword(p) { return btoa(p); }
+function generateId() { return Date.now() + Math.floor(Math.random() * 1000000); }
+
+// ============================================
+// SESSION MANAGEMENT (from index.html)
+// ============================================
+function checkSession() {
+  const raw = localStorage.getItem("dhsud_session");
+  if (raw) {
+    try {
+      const s = JSON.parse(raw);
+      const diff = (new Date() - new Date(s.loggedInAt)) / (1000 * 60 * 60);
+      if (diff < 12 && s.email) {
+        currentUser = s;
+        return true;
+      } else localStorage.removeItem("dhsud_session");
+    } catch(e) { localStorage.removeItem("dhsud_session"); }
+  }
+  currentUser = null;
+  return false;
+}
+
+function getUserInitials(n) { if (!n) return "U"; let p = n.split(" "); if (p.length >= 2) return (p[0][0] + p[1][0]).toUpperCase(); return n.substring(0,2).toUpperCase(); }
+function getRoleLabel(r) { if (r === "admin") return "👑 Admin"; if (r === "encoder" || r === "staff") return "📋 Staff/Officer"; return "👁️ Viewer"; }
+function getRoleClass(r) { if (r === "admin") return "admin"; if (r === "encoder" || r === "staff") return "staff"; return "viewer"; }
+
+// ============================================
+// RENDER NAVIGATION & USER MENU (from index.html)
+// ============================================
+function renderMainNavigation() {
+  const container = document.getElementById("mainNavContainer");
+  if (!container) return;
+  let navHtml = `<a href="index.html"><i class="fas fa-home"></i> Home</a>`;
+  if (currentUser) {
+    navHtml += `
+      <div class="dropdown">
+        <button class="dropbtn">Certification</button>
+        <div class="dropdown-content">
+          <a href="lc.html">Locational Clearance</a>
+          <a href="SZC.html">Site Zoning Certification</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn">Land Use Plans</button>
+        <div class="dropdown-content">
+          <div class="dropdown-submenu">
+            <button class="submenu-trigger">CLUP & ZO <span class="arrow-right">▸</span></button>
+            <div class="submenu-content">
+              <a href="inventory.html">Inventory</a>
+              <a href="status.html">Status</a>
+            </div>
+          </div>
+          <a href="status.html">PDPFP</a>
+        </div>
+      </div>
+      <a href="Techsamp.html"><i class="fas fa-headset"></i> Technical Assistance</a>
+      <a href="lgu-info.html" class="active"><i class="fas fa-city"></i> LGU Information</a>
+      <a href="report.html"><i class="fas fa-chart-pie"></i> Reports</a>
+      <a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a>
+      <a href="issuance.html"><i class="fas fa-file-alt"></i> Issuances</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+    `;
+  } else {
+    navHtml += `<a href="index.html#about">About</a><a href="index.html#contact">Contact</a>`;
+  }
+  container.innerHTML = navHtml;
+  setTimeout(() => {
+    document.querySelectorAll(".dropdown-submenu .submenu-trigger").forEach((trigger) => {
+      trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const submenu = trigger.closest(".dropdown-submenu");
+        if (submenu) submenu.classList.toggle("open");
+      });
+    });
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".dropdown-submenu")) {
+        document.querySelectorAll(".dropdown-submenu.open").forEach((s) => s.classList.remove("open"));
+      }
+    });
+  }, 10);
+}
+
+function renderUserMenu() {
+  const container = document.getElementById("userMenuContainer");
+  if (!container) return;
+  if (currentUser) {
+    const initials = getUserInitials(currentUser.fullName);
+    const firstName = currentUser.fullName?.split(" ")[0] || "User";
+    const roleLabel = getRoleLabel(currentUser.role);
+    const roleClass = getRoleClass(currentUser.role);
+    container.innerHTML = `
+      <div class="user-menu" id="userMenuDropdown" style="position:relative;">
+        <div class="user-avatar">${initials}</div>
+        <span class="user-name">${escapeHtml(firstName)}</span>
+        <span class="role-badge-header ${roleClass}">${roleLabel}</span>
+        <span style="font-size:0.6rem;">▼</span>
+        <div class="user-dropdown-menu">
+          <div class="user-dropdown-item">👤 ${escapeHtml(currentUser.email)}</div>
+          <div class="user-dropdown-item">🏢 ${escapeHtml(currentUser.office || "ELUPDD")}</div>
+          ${currentUser.role === "admin" ? `<div class="user-dropdown-item" id="adminConsoleLink">⚙️ Manage Users</div>` : ""}
+          <div class="user-dropdown-item" id="logoutDropdownBtn" style="color:#dc2626;">🚪 Sign Out</div>
+        </div>
+      </div>
+    `;
+    const userDiv = document.getElementById("userMenuDropdown");
+    if (userDiv) {
+      userDiv.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const menu = userDiv.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = menu.style.display === "block" ? "none" : "block";
+      });
+      document.addEventListener("click", () => {
+        const menu = userDiv?.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = "none";
+      });
+    }
+    if (currentUser.role === "admin") {
+      const adminBtn = document.getElementById("adminConsoleLink");
+      if (adminBtn) adminBtn.addEventListener("click", () => (window.location.href = "admin.html"));
+    }
+    const logoutBtn = document.getElementById("logoutDropdownBtn");
+    if (logoutBtn) logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("dhsud_session");
+      showToast("Logged Out", "You have been logged out successfully.", "info");
+      setTimeout(() => { window.location.href = "lgu-info.html"; }, 700);
+    });
+  } else {
+    container.innerHTML = `<div class="login-prompt" onclick="openLoginModal()"><i class="fas fa-sign-in-alt"></i> Sign In</div>`;
+  }
+}
+
+// ============================================
+// LOGIN MODAL (from index.html)
+// ============================================
+function openLoginModal() {
+  document.getElementById("loginModal").classList.add("active");
+}
+function closeLoginModal() {
+  document.getElementById("loginModal").classList.remove("active");
+}
+async function handleModalLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById("modalLoginEmail").value.trim().toLowerCase();
+  const password = document.getElementById("modalLoginPassword").value;
+  const btn = document.getElementById("loginModalBtn");
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Authenticating...";
+  try {
+    const resp = await fetch(`${GOOGLE_SCRIPT_URL}?action=get&data_type=users&_=${Date.now()}`);
+    const users = await resp.json();
+    const user = users.find((u) => u.email?.toLowerCase() === email);
+    if (!user) { showToast("Authentication Failed", "Account not found.", "error"); btn.innerHTML = originalText; btn.disabled = false; return false; }
+    if (user.password === encodePassword(password)) {
+      const session = { userId: user.id, email: user.email, fullName: user.fullName, office: user.office || "ELUPDD", role: user.role, loggedInAt: new Date().toISOString() };
+      localStorage.setItem("dhsud_session", JSON.stringify(session));
+      showToast("Welcome", `Welcome ${user.fullName?.split(" ")[0] || ""}!`, "success");
+      closeLoginModal();
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showToast("Authentication Failed", "Invalid password.", "error");
+    }
+  } catch (error) {
+    showToast("Connection Error", "Please try again.", "error");
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+  return false;
+}
+
+// ============================================
+// DATA FUNCTIONS
+// ============================================
+const provinceList = ["AKLAN", "ANTIQUE", "CAPIZ", "GUIMARAS", "ILOILO", "NEGROS OCCIDENTAL"];
+
+const municipalityByProvince = {
+  AKLAN: ["Provincial Government", "Altavas", "Balete", "Banga", "Batan", "Buruanga", "Ibajay", "Kalibo", "Lezo", "Libacao", "Madalag", "Makato", "Malay", "Malinao", "Nabas", "New Washington", "Numancia", "Tangalan"],
+  ANTIQUE: ["Provincial Government", "Anini-y", "Barbaza", "Belison", "Bugasong", "Caluya", "Culasi", "Tobias Fornier", "Hamtic", "Laua-an", "Libertad", "Pandan", "Patnongon", "San Jose", "San Remigio", "Sebaste", "Sibalom", "Tibiao", "Valderrama"],
+  CAPIZ: ["Provincial Government", "Cuartero", "Dao", "Dumalag", "Dumarao", "Ivisan", "Jamindan", "Ma-ayon", "Mambusao", "Panay", "Panitan", "Pilar", "Pontevedra", "President Roxas", "City of Roxas", "Sapi-an", "Sigma", "Tapaz"],
+  GUIMARAS: ["Provincial Government", "Buenavista", "Jordan", "Nueva Valencia", "San Lorenzo", "Sibunag"],
+  ILOILO: ["Provincial Government", "Ajuy", "Alimodian", "Anilao", "Badiangan", "Balasan", "Banate", "Barotac Nuevo", "Barotac Viejo", "Batad", "Bingawan", "Cabatuan", "Calinog", "Carles", "Concepcion", "Dingle", "Dueñas", "Dumangas", "Estancia", "Guimbal", "Igbaras", "Janiuay", "Lambunao", "Leganes", "Lemery", "Leon", "Maasin", "Miagao", "Mina", "New Lucena", "Oton", "City of Passi", "Pavia", "Pototan", "San Dionisio", "San Enrique", "San Joaquin", "San Miguel", "San Rafael", "Santa Barbara", "Sara", "Tigbauan", "Tubungan", "Zarraga", "City of Iloilo"],
+  "NEGROS OCCIDENTAL": ["Provincial Government", "Bacolod City", "Bago City", "Binalbagan", "Cadiz City", "Calatrava", "Candoni", "Cauayan", "Enrique B. Magalona", "Escalante City", "Himamaylan City", "Hinigaran", "Hinoba-an", "Ilog", "Isabela", "Kabankalan City", "La Carlota City", "La Castellana", "Manapla", "Moises Padilla", "Murcia", "Pontevedra", "Pulupandan", "Sagay City", "San Carlos City", "San Enrique", "Silay City", "Sipalay City", "Talisay City", "Toboso", "Valladolid", "Victorias City"]
+};
+
+function getStatusBadge(status) {
+  if (!status || status === "") return '<span class="status-badge status-for-updating">—</span>';
+  const lower = status.toLowerCase().trim();
+  if (lower === 'updated' || lower.includes('updated')) return `<span class="status-badge status-updated">✅ Updated</span>`;
+  if (lower === 'under review' || lower.includes('under review') || lower.includes('review')) return `<span class="status-badge status-under-review">📋 Under Review</span>`;
+  if (lower === 'for updating' || lower.includes('for updating') || lower.includes('due')) return `<span class="status-badge status-for-updating">🔄 For Updating</span>`;
+  return `<span class="status-badge status-for-updating">${escapeHtml(status)}</span>`;
+}
+
+function getMonitoringBadge(value) {
+  if (!value) return '<span class="status-badge status-non-conducted">—</span>';
+  const lower = value.toLowerCase();
+  if (lower.includes('conducted')) return `<span class="status-badge status-conducted">Conducted</span>`;
+  return `<span class="status-badge status-non-conducted">Non-Conducted</span>`;
+}
+
+// ============================================
+// GOOGLE SHEETS API FUNCTIONS
+// ============================================
+async function fetchLGUsFromSheet() {
+  try {
+    showToast("Fetching data from Google Sheets...", "info");
+    const url = `${GOOGLE_SCRIPT_URL_LGU}?action=get&data_type=lgu&_=${Date.now()}`;
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    console.log("Fetch result:", result);
+    
+    let data = [];
+    if (Array.isArray(result)) {
+      data = result;
+    } else if (result.success && Array.isArray(result.data)) {
+      data = result.data;
+    } else if (result.data && Array.isArray(result.data)) {
+      data = result.data;
+    } else if (result.data && !Array.isArray(result.data)) {
+      data = Object.values(result.data);
+    }
+    
+    if (data && data.length > 0) {
+      const lgus = data.map(record => ({
+        id: record.id || record["id"] || generateId(),
+        psgc: record.psgc || record["PSGC"] || "",
+        incomeClass: record.incomeClass || record["Income Class"] || "",
+        region: record.region || record["Region"] || "REGION VI (WESTERN VISAYAS)",
+        province: record.province || record["Province"] || "",
+        municipality: record.municipality || record["Municipality"] || record["LGU Name"] || "",
+        mayor: record.mayor || record["Name of Local Chief Executive"] || "",
+        viceMayor: record.viceMayor || record["Name of Vice Governor/Mayor"] || "",
+        email: record.email || record["Official Email Address of LGU"] || "",
+        landline: record.landline || record["Official Phone/Landline Number of LGU"] || "",
+        mpdc: record.mpdc || record["Name of C/M/PPDC"] || "",
+        mpdcEmail: record.mpdcEmail || record["C/M/PPDO Email Address"] || "",
+        mpdcMobile: record.mpdcMobile || record["C/M/PPDO Contact Number"] || "",
+        planningPeriod: record.planningPeriod || record["Planning Period of last approved plan"] || "",
+        clupStatus: record.clupStatus || record["PDPFP/CLUP Status"] || record["CLUP Status"] || record["Status"] || "",
+        tableMonitoring: record.tableMonitoring || record["Table Monitoring"] || "",
+        fieldMonitoring: record.fieldMonitoring || record["Field Monitoring"] || "",
+        recentActivities: record.recentActivities || record["Recent Activities undertaken on CLUP&ZO or PDPFP Formulation/Updating"] || "",
+        taNeeds: record.taNeeds || record["TA needs"] || "",
+        dateUpdated: record.dateUpdated || record["Date last updated"] || "",
+        remarks: record.remarks || record["Remarks"] || "",
+        contactedText: record.contactedText || record["Contacted via Text/Call"] || "",
+        contactedFb: record.contactedFb || record["Contacted via FB Messenger"] || ""
+      }));
+      return lgus;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching LGUs from sheet:", error);
+    showToast("Error fetching from Google Sheets. Using local data.", "error");
+    return [];
+  }
+}
+
+async function saveLGUToSheet(lguData) {
+  try {
+    const record = {
+      "PSGC": lguData.psgc || "",
+      "Income Class": lguData.incomeClass || "",
+      "Region": "REGION VI (WESTERN VISAYAS)",
+      "Province": lguData.province || "",
+      "Municipality": lguData.municipality || "",
+      "Name of Local Chief Executive": lguData.mayor || "",
+      "Name of Vice Governor/Mayor": lguData.viceMayor || "",
+      "Official Email Address of LGU": lguData.email || "",
+      "Official Phone/Landline Number of LGU": lguData.landline || "",
+      "Name of C/M/PPDC": lguData.mpdc || "",
+      "C/M/PPDO Email Address": lguData.mpdcEmail || "",
+      "C/M/PPDO Contact Number": lguData.mpdcMobile || "",
+      "Planning Period of last approved plan": lguData.planningPeriod || "",
+      "PDPFP/CLUP Status": lguData.clupStatus || "",
+      "Table Monitoring": lguData.tableMonitoring || "",
+      "Field Monitoring": lguData.fieldMonitoring || "",
+      "Recent Activities undertaken on CLUP&ZO or PDPFP Formulation/Updating": lguData.recentActivities || "",
+      "TA needs": lguData.taNeeds || "",
+      "Date last updated": lguData.dateUpdated || "",
+      "Remarks": lguData.remarks || "",
+      "Contacted via Text/Call": lguData.contactedText || "",
+      "Contacted via FB Messenger": lguData.contactedFb || ""
+    };
+
+    const response = await fetch(GOOGLE_SCRIPT_URL_LGU, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `action=add&data_type=lgu&data=${encodeURIComponent(JSON.stringify(record))}`
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error saving LGU to sheet:", error);
+    return { success: false, error: error.toString() };
+  }
+}
+
+async function updateLGUInSheet(lguData) {
+  try {
+    const record = {
+      "PSGC": lguData.psgc || "",
+      "Income Class": lguData.incomeClass || "",
+      "Region": "REGION VI (WESTERN VISAYAS)",
+      "Province": lguData.province || "",
+      "Municipality": lguData.municipality || "",
+      "Name of Local Chief Executive": lguData.mayor || "",
+      "Name of Vice Governor/Mayor": lguData.viceMayor || "",
+      "Official Email Address of LGU": lguData.email || "",
+      "Official Phone/Landline Number of LGU": lguData.landline || "",
+      "Name of C/M/PPDC": lguData.mpdc || "",
+      "C/M/PPDO Email Address": lguData.mpdcEmail || "",
+      "C/M/PPDO Contact Number": lguData.mpdcMobile || "",
+      "Planning Period of last approved plan": lguData.planningPeriod || "",
+      "PDPFP/CLUP Status": lguData.clupStatus || "",
+      "Table Monitoring": lguData.tableMonitoring || "",
+      "Field Monitoring": lguData.fieldMonitoring || "",
+      "Recent Activities undertaken on CLUP&ZO or PDPFP Formulation/Updating": lguData.recentActivities || "",
+      "TA needs": lguData.taNeeds || "",
+      "Date last updated": lguData.dateUpdated || "",
+      "Remarks": lguData.remarks || "",
+      "Contacted via Text/Call": lguData.contactedText || "",
+      "Contacted via FB Messenger": lguData.contactedFb || ""
+    };
+
+    const response = await fetch(GOOGLE_SCRIPT_URL_LGU, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `action=update&data_type=lgu&data=${encodeURIComponent(JSON.stringify(record))}`
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error updating LGU in sheet:", error);
+    return { success: false, error: error.toString() };
+  }
+}
+
+async function deleteLGUFromSheet(lguData) {
+  try {
+    const deleteId = `${lguData.municipality}_${lguData.province}`;
+    const response = await fetch(GOOGLE_SCRIPT_URL_LGU, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `action=delete&data_type=lgu&id=${encodeURIComponent(deleteId)}`
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error deleting LGU from sheet:", error);
+    return { success: false, error: error.toString() };
+  }
+}
+
+async function syncClupStatusDirect(province, municipality, newStatus) {
+  try {
+    const url = `${GOOGLE_SCRIPT_URL_LGU}?action=sync_clup_status&province=${encodeURIComponent(province)}&municipality=${encodeURIComponent(municipality)}&status=${encodeURIComponent(newStatus)}&_=${Date.now()}`;
+    const response = await fetch(url);
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error syncing:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================
+// SYNC FUNCTIONS
+// ============================================
+async function syncAllToSheet() {
+  if (isSyncing) return;
+  isSyncing = true;
+  showToast("Syncing all data to Google Sheets...", "info");
+  
+  try {
+    let successCount = 0;
+    let failCount = 0;
+    
+    for (const lgu of lguDatabase) {
+      const result = await saveLGUToSheet(lgu);
+      if (result.success) {
+        successCount++;
+      } else {
+        failCount++;
+        console.error("Failed to sync LGU:", lgu.municipality, result.error);
+      }
+    }
+    
+    showToast(`Sync complete: ${successCount} saved, ${failCount} failed`, successCount > 0 ? "success" : "error");
+  } catch (error) {
+    showToast("Sync error: " + error.message, "error");
+  }
+  
+  isSyncing = false;
+}
+
+// ============================================
+// LGU DATA FUNCTIONS
+// ============================================
+function getInitialLGUs() {
+  const stored = localStorage.getItem("lgu_master_db_v4");
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed && parsed.length > 0) return parsed;
+    } catch(e) {}
+  }
+  return [];
+}
+
+async function loadData() {
+  document.getElementById("lguGrid").innerHTML = '<div style="text-align:center;padding:2rem;color:#94a3b8;"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i><p style="margin-top:0.5rem;">Loading LGUs from database...</p></div>';
+  
+  try {
+    const lgusFromSheet = await fetchLGUsFromSheet();
+    
+    if (lgusFromSheet && lgusFromSheet.length > 0) {
+      lguDatabase = lgusFromSheet;
+      localStorage.setItem("lgu_master_db_v4", JSON.stringify(lguDatabase));
+      showToast(`Loaded ${lguDatabase.length} LGUs from Google Sheets`, "success");
+    } else {
+      const localData = getInitialLGUs();
+      if (localData.length > 0) {
+        lguDatabase = localData;
+        showToast(`Loaded ${lguDatabase.length} LGUs from local storage`, "info");
+      } else {
+        lguDatabase = [];
+        localStorage.setItem("lgu_master_db_v4", JSON.stringify(lguDatabase));
+        showToast("No LGUs found. Register your first LGU!", "info");
+      }
+    }
+    
+    renderAll();
+  } catch (error) {
+    console.error("Error loading data:", error);
+    const localData = getInitialLGUs();
+    if (localData.length > 0) {
+      lguDatabase = localData;
+    } else {
+      lguDatabase = [];
+    }
+    localStorage.setItem("lgu_master_db_v4", JSON.stringify(lguDatabase));
+    renderAll();
+    showToast("Using local data. Please check connection to Google Sheets.", "error");
+  }
+}
+
+function renderAll() {
+  populateDropdowns();
+  updateProvinceFilter();
+  renderLGUList();
+  updateTotalStats();
+}
+
+function populateDropdowns() {
+  const provSelect = document.getElementById("regProvince");
+  provSelect.innerHTML = '<option value="">-- Select Province --</option>' + 
+    provinceList.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+  
+  provSelect.addEventListener("change", function() {
+    const munSelect = document.getElementById("regMunicipality");
+    const selected = this.value;
+    if(!selected || !municipalityByProvince[selected]) { 
+      munSelect.innerHTML = '<option value="">-- Select City/Municipality --</option>'; 
+      document.getElementById("regPsgc").value = "";
+      return; 
+    }
+    const municipalities = municipalityByProvince[selected];
+    munSelect.innerHTML = '<option value="">-- Select City/Municipality --</option>' + 
+      municipalities.map(m => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");
+  });
+  
+  document.getElementById("regMunicipality").addEventListener("change", function() {
+    const selected = this.value;
+    if (selected && selected !== "Provincial Government" && PSGC_DATA[selected]) {
+      document.getElementById("regPsgc").value = PSGC_DATA[selected];
+    } else if (selected === "Provincial Government") {
+      document.getElementById("regPsgc").value = "N/A - Provincial Government";
+    } else {
+      document.getElementById("regPsgc").value = "";
+    }
+  });
+}
+
+function updateProvinceFilter() {
+  const provinces = [...new Set(lguDatabase.map(l => l.province))].filter(Boolean).sort();
+  const f = document.getElementById("provinceFilter");
+  f.innerHTML = '<option value="">All Provinces</option>' + 
+    provinces.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+}
+
+function renderLGUList() {
+  const searchTerm = document.getElementById("globalSearch").value.toLowerCase();
+  const provinceVal = document.getElementById("provinceFilter").value;
+  
+  let filtered = lguDatabase.filter(l => {
+    const matchProvince = provinceVal ? l.province === provinceVal : true;
+    const matchSearch = searchTerm === "" || 
+      (l.municipality && l.municipality.toLowerCase().includes(searchTerm)) || 
+      (l.mayor && l.mayor.toLowerCase().includes(searchTerm)) || 
+      (l.mpdc && l.mpdc.toLowerCase().includes(searchTerm)) ||
+      (l.email && l.email.toLowerCase().includes(searchTerm));
+    return matchProvince && matchSearch;
+  });
+  
+  const container = document.getElementById("lguGrid");
+  if(filtered.length === 0) { 
+    container.innerHTML = '<div style="text-align:center;padding:2rem;color:#94a3b8;">No LGU records found. Click "Register New LGU" to add one.</div>'; 
+    return; 
+  }
+  
+  container.innerHTML = filtered.map(l => `
+    <div class="lgu-card-item">
+      <div class="lgu-info-summary">
+        <h3><i class="fas fa-city"></i> ${escapeHtml(l.municipality || '—')}${l.municipality === 'Provincial Government' ? ` (${escapeHtml(l.province || '')})` : `, ${escapeHtml(l.province || '')}`}</h3>
+        <p>
+          <i class="fas fa-user-tie"></i> ${l.municipality === 'Provincial Government' ? 'Governor' : 'Mayor'}: ${escapeHtml(l.mayor || '—')} | 
+          <i class="fas fa-user-cog"></i> MPDC: ${escapeHtml(l.mpdc || '—')}
+          ${l.clupStatus ? ` | ${getStatusBadge(l.clupStatus)}` : ''}
+        </p>
+      </div>
+      <div class="lgu-actions">
+        <button class="view-btn" onclick="viewLGUPopup('${l.id}')"><i class="fas fa-eye"></i> View</button>
+        <button class="btn-danger" onclick="deleteLGU('${l.id}')"><i class="fas fa-trash-alt"></i> Delete</button>
+      </div>
+    </div>
+  `).join("");
+  document.getElementById("totalCountStat").innerHTML = `<i class="fas fa-database"></i> Total LGUs: ${lguDatabase.length} | Showing: ${filtered.length}`;
+}
+
+function updateTotalStats() { renderLGUList(); }
+
+// ============================================
+// VIEW, EDIT, DELETE FUNCTIONS
+// ============================================
+function viewLGUPopup(lguId) {
+  const l = lguDatabase.find(l => String(l.id) === String(lguId));
+  if(!l) return;
+  
+  const isProvincial = l.municipality === "Provincial Government";
+  const statusBadge = getStatusBadge(l.clupStatus);
+  
+  const viewContent = `
+    <div style="margin-bottom:1rem;">
+      <strong style="font-size:1.2rem; color:#1e3a8a;"><i class="fas fa-city"></i> ${escapeHtml(l.municipality || '—')}</strong>
+      <span style="color:#64748b;">(${escapeHtml(l.province || '—')})</span>
+      ${isProvincial ? '<span style="margin-left:12px;background:#e0e7ff;padding:2px 12px;border-radius:20px;font-size:0.7rem;font-weight:600;color:#1e40af;"><i class="fas fa-landmark"></i> Provincial</span>' : ''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem 1.5rem;">
+      <div class="info-row"><div class="info-label"><i class="fas fa-hashtag"></i> PSGC:</div><div class="info-value">${escapeHtml(l.psgc || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-map-pin"></i> Region:</div><div class="info-value">${escapeHtml(l.region || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-tag"></i> Income Class:</div><div class="info-value">${escapeHtml(l.incomeClass || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-calendar-alt"></i> Planning Period:</div><div class="info-value">${escapeHtml(l.planningPeriod || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-user-tie"></i> ${isProvincial ? 'Governor:' : 'Mayor:'}</div><div class="info-value">${escapeHtml(l.mayor || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-user"></i> ${isProvincial ? 'Vice Governor:' : 'Vice Mayor:'}</div><div class="info-value">${escapeHtml(l.viceMayor || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-envelope"></i> LGU Email:</div><div class="info-value">${escapeHtml(l.email || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-phone"></i> LGU Landline:</div><div class="info-value">${escapeHtml(l.landline || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-user-cog"></i> MPDC:</div><div class="info-value">${escapeHtml(l.mpdc || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-envelope"></i> MPDC Email:</div><div class="info-value">${escapeHtml(l.mpdcEmail || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-phone"></i> MPDC Mobile:</div><div class="info-value">${escapeHtml(l.mpdcMobile || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-file-alt"></i> CLUP Status:</div><div class="info-value">${statusBadge}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-table"></i> Table Monitoring:</div><div class="info-value">${getMonitoringBadge(l.tableMonitoring)}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-clipboard-check"></i> Field Monitoring:</div><div class="info-value">${getMonitoringBadge(l.fieldMonitoring)}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fas fa-sms"></i> Contacted (Text/Call):</div><div class="info-value">${escapeHtml(l.contactedText || '—')}</div></div>
+      <div class="info-row"><div class="info-label"><i class="fab fa-facebook-messenger"></i> Contacted (FB):</div><div class="info-value">${escapeHtml(l.contactedFb || '—')}</div></div>
+    </div>
+    ${l.recentActivities ? `<div class="info-row" style="grid-column:1/-1;margin-top:0.5rem;"><div class="info-label"><i class="fas fa-tasks"></i> Recent Activities:</div><div class="info-value">${escapeHtml(l.recentActivities)}</div></div>` : ''}
+    ${l.taNeeds ? `<div class="info-row" style="grid-column:1/-1;"><div class="info-label"><i class="fas fa-hands-helping"></i> TA Needs:</div><div class="info-value">${escapeHtml(l.taNeeds)}</div></div>` : ''}
+    ${l.remarks ? `<div class="info-row" style="grid-column:1/-1;"><div class="info-label"><i class="fas fa-comment"></i> Remarks:</div><div class="info-value">${escapeHtml(l.remarks)}</div></div>` : ''}
+    ${l.dateUpdated ? `<div class="info-row"><div class="info-label"><i class="fas fa-calendar-alt"></i> Date Updated:</div><div class="info-value">${escapeHtml(l.dateUpdated)}</div></div>` : ''}
+  `;
+  
+  document.getElementById("viewContent").innerHTML = viewContent;
+  document.getElementById("viewModal").classList.add("active");
+}
+
+async function deleteLGU(lguId) {
+  if (!confirm("Are you sure you want to delete this LGU? This action cannot be undone.")) return;
+  
+  const l = lguDatabase.find(l => String(l.id) === String(lguId));
+  if (!l) return;
+  
+  try {
+    const result = await deleteLGUFromSheet(l);
+    
+    if (result.success) {
+      lguDatabase = lguDatabase.filter(item => String(item.id) !== String(lguId));
+      localStorage.setItem("lgu_master_db_v4", JSON.stringify(lguDatabase));
+      renderAll();
+      showToast(`✅ LGU ${l.municipality || 'Unknown'} deleted from Google Sheets!`, "success");
+    } else {
+      lguDatabase = lguDatabase.filter(item => String(item.id) !== String(lguId));
+      localStorage.setItem("lgu_master_db_v4", JSON.stringify(lguDatabase));
+      renderAll();
+      showToast(`⚠️ LGU ${l.municipality || 'Unknown'} removed locally only.`, "info");
+    }
+  } catch (error) {
+    showToast(`❌ Error: ${error.message}`, "error");
+    lguDatabase = lguDatabase.filter(item => String(item.id) !== String(lguId));
+    localStorage.setItem("lgu_master_db_v4", JSON.stringify(lguDatabase));
+    renderAll();
+  }
+}
+
+// ============================================
+// MODAL CONTROLS
+// ============================================
+function closeModal(id) {
+  document.getElementById(id).classList.remove("active");
+}
+
+function showLGURegModal() {
+  document.getElementById("lguModal").classList.add("active");
+  document.getElementById("lguRegForm").reset();
+  document.getElementById("regRegion").value = "REGION VI (WESTERN VISAYAS)";
+  document.getElementById("regPsgc").value = "";
+}
+
+// ============================================
+// FORM SUBMIT
+// ============================================
+document.getElementById("lguRegForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (isSaving) return;
+  
+  const prov = document.getElementById("regProvince").value;
+  const mun = document.getElementById("regMunicipality").value;
+  const psgc = document.getElementById("regPsgc").value;
+  
+  if(!prov || !mun) { 
+    showToast("Please select both Province and City/Municipality.", "error");
+    return; 
+  }
+  
+  const exists = lguDatabase.some(l => 
+    l.municipality === mun && l.province === prov
+  );
+  if (exists) {
+    showToast(`LGU ${mun}, ${prov} already exists!`, "error");
+    return;
+  }
+  
+  const newLGU = { 
+    id: generateId(),
+    psgc: psgc || "",
+    incomeClass: document.getElementById("regIncomeClass").value || "",
+    region: "REGION VI (WESTERN VISAYAS)",
+    province: prov,
+    municipality: mun,
+    mayor: document.getElementById("regMayor").value || "",
+    viceMayor: document.getElementById("regViceMayor").value || "",
+    email: document.getElementById("regEmail").value || "",
+    landline: document.getElementById("regLandline").value || "",
+    mpdc: document.getElementById("regMpdc").value || "",
+    mpdcEmail: document.getElementById("regMpdcEmail").value || "",
+    mpdcMobile: document.getElementById("regMpdcMobile").value || "",
+    planningPeriod: document.getElementById("regPlanningPeriod").value || "",
+    clupStatus: document.getElementById("regClupStatus").value || "",
+    tableMonitoring: document.getElementById("regTableMonitoring").value || "",
+    fieldMonitoring: document.getElementById("regFieldMonitoring").value || "",
+    recentActivities: document.getElementById("regRecentActivities").value || "",
+    taNeeds: document.getElementById("regTaNeeds").value || "",
+    dateUpdated: document.getElementById("regDateUpdated").value || "",
+    remarks: document.getElementById("regRemarks").value || "",
+    contactedText: document.getElementById("regContactedText").value || "",
+    contactedFb: document.getElementById("regContactedFb").value || ""
+  };
+  
+  const btn = document.getElementById("saveLGUBtn");
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  btn.disabled = true;
+  isSaving = true;
+  
+  try {
+    const result = await saveLGUToSheet(newLGU);
+    
+    if (result.success) {
+      lguDatabase.push(newLGU);
+      localStorage.setItem("lgu_master_db_v4", JSON.stringify(lguDatabase));
+      renderAll();
+      closeModal("lguModal");
+      document.getElementById("lguRegForm").reset();
+      document.getElementById("regRegion").value = "REGION VI (WESTERN VISAYAS)";
+      document.getElementById("regPsgc").value = "";
+      showToast(`✅ LGU ${mun}, ${prov} registered successfully to Google Sheets!`, "success");
+      
+      if (newLGU.clupStatus) {
+        try {
+          const syncResult = await syncClupStatusDirect(newLGU.province, newLGU.municipality, newLGU.clupStatus);
+          if (syncResult.success) {
+            showToast(`✅ LGU registered with status: "${newLGU.clupStatus}"`, "success");
+          }
+        } catch (syncError) {
+          console.error("Error syncing new LGU status:", syncError);
+        }
+      }
+    } else {
+      showToast(`❌ Error saving to Google Sheets: ${result.error || "Unknown error"}`, "error");
+      lguDatabase.push(newLGU);
+      localStorage.setItem("lgu_master_db_v4", JSON.stringify(lguDatabase));
+      renderAll();
+      closeModal("lguModal");
+      document.getElementById("lguRegForm").reset();
+      document.getElementById("regRegion").value = "REGION VI (WESTERN VISAYAS)";
+      document.getElementById("regPsgc").value = "";
+      showToast(`⚠️ LGU ${mun}, ${prov} saved locally only.`, "info");
+    }
+  } catch (error) {
+    showToast(`❌ Error: ${error.message}`, "error");
+    lguDatabase.push(newLGU);
+    localStorage.setItem("lgu_master_db_v4", JSON.stringify(lguDatabase));
+    renderAll();
+    closeModal("lguModal");
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    isSaving = false;
+  }
+});
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
+document.getElementById("applyFilterBtn")?.addEventListener("click", () => renderLGUList());
+document.getElementById("globalSearch")?.addEventListener("keyup", () => renderLGUList());
+
+// Modal close on backdrop click
+window.onclick = function(e) {
+  const lguModal = document.getElementById("lguModal");
+  if (e.target === lguModal) closeModal("lguModal");
+  const viewModal = document.getElementById("viewModal");
+  if (e.target === viewModal) closeModal("viewModal");
+  const loginModal = document.getElementById("loginModal");
+  if (e.target === loginModal) closeLoginModal();
+};
+
+// ============================================
+// INITIALIZATION
+// ============================================
+document.addEventListener("DOMContentLoaded", function() {
+  checkSession();
+  renderMainNavigation();
+  renderUserMenu();
+  loadData();
+  
+  const form = document.getElementById("modalLoginForm");
+  if (form) form.addEventListener("submit", handleModalLogin);
+});
+
+// Expose functions globally
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
+window.showLGURegModal = showLGURegModal;
+window.closeModal = closeModal;
+window.viewLGUPopup = viewLGUPopup;
+window.deleteLGU = deleteLGU;
+window.syncAllToSheet = syncAllToSheet;
+</script>
+</body>
+</html>

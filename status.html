@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DHSUD VI | ELUPDD - CLUP/ZO Formulation Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ===== BASE STYLES (from indexGUI.html) ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", "Segoe UI", Roboto, sans-serif; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 1.5rem 1.5rem 2rem;
+      background: #f4f7fc;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(26, 115, 232, 0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, rgba(0, 200, 150, 0.06) 0%, transparent 60%),
+                  linear-gradient(145deg, #f0f4f8 0%, #e8edf3 100%);
+      z-index: 0;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(25px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+      0% { opacity: 0; transform: translateX(-40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      0% { opacity: 0; transform: translateX(40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+    .animate-fadeUp { animation: fadeUp 0.7s ease forwards; }
+    .animate-slideLeft { animation: slideInLeft 0.6s ease forwards; }
+    .animate-slideRight { animation: slideInRight 0.6s ease forwards; }
+
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== HEADER / NAVIGATION (from indexGUI.html) ===== */
+    .app-header {
+      width: 100%;
+      max-width: 1280px;
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: white;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      position: relative;
+      z-index: 5;
+    }
+    .app-header .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .app-header .brand img {
+      height: 42px;
+      width: auto;
+      display: block;
+      border-radius: 8px;
+    }
+    .app-header .brand span {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #1e3a8a;
+      letter-spacing: -0.3px;
+    }
+    .app-header .brand small {
+      font-weight: 400;
+      font-size: 0.6rem;
+      color: #64748b;
+      display: block;
+      margin-top: -2px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Navigation links - center */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      flex: 1;
+      justify-content: center;
+    }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-decoration: none;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .nav-links a i { font-size: 0.8rem; }
+    .nav-links a:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .nav-links a.active {
+      background: #1e3a8a;
+      color: white;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+    .nav-links a.active:hover {
+      background: #2563eb;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropbtn {
+      background: none;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+    .dropbtn:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: white;
+      min-width: 210px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      z-index: 1000;
+      top: 36px;
+      left: 0;
+      border: 1px solid #eef2ff;
+      padding: 0.3rem 0;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 0.6rem 1.2rem;
+      color: #1e293b;
+      font-size: 0.75rem;
+      text-decoration: none;
+      border: none;
+      background: none;
+      border-radius: 0;
+    }
+    .dropdown-content a:hover {
+      background: #eff6ff;
+    }
+    .dropdown-submenu {
+      position: relative;
+    }
+    .submenu-trigger {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: inherit;
+    }
+    .submenu-trigger:hover { background: #eff6ff; }
+    .arrow-right { font-size: 0.7rem; margin-left: 1rem; }
+    .submenu-content {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: white;
+      min-width: 170px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      border: 1px solid #eef2ff;
+      z-index: 1001;
+      padding: 0.3rem 0;
+    }
+    .dropdown-submenu:hover .submenu-content {
+      display: block;
+    }
+    .submenu-content a { padding: 0.6rem 1.2rem; }
+    .dropbtn::after {
+      content: " ▾";
+      font-size: 0.6rem;
+      opacity: 0.6;
+    }
+    .dropdown:hover .dropbtn::after {
+      opacity: 1;
+    }
+
+    /* User menu - right side */
+    .user-menu-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.15rem 0.5rem 0.15rem 0.7rem;
+      border-radius: 60px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .user-menu:hover { background: #e2e8f0; }
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      background: #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .user-name {
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    .role-badge-header {
+      background: #e2e8f0;
+      padding: 0.1rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.55rem;
+      font-weight: 600;
+    }
+    .role-badge-header.admin { background: #dcfce7; color: #166534; }
+    .role-badge-header.staff { background: #dbeafe; color: #1e40af; }
+    .user-dropdown-menu {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: white;
+      border-radius: 20px;
+      min-width: 180px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+      border: 1px solid #eef2ff;
+      overflow: hidden;
+      display: none;
+      z-index: 200;
+    }
+    .user-dropdown-item {
+      padding: 0.7rem 1.2rem;
+      border-bottom: 1px solid #f1f5f9;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .user-dropdown-item:hover { background: #f8fafc; }
+    .login-prompt {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.2rem 0.8rem 0.2rem 1rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #1e3a8a;
+    }
+    .login-prompt:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* ===== TOAST NOTIFICATIONS (from indexGUI.html) ===== */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      width: 100%;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transform: translateX(120%);
+      animation: slideIn 0.5s ease forwards;
+      border-left: 5px solid #2563eb;
+      min-height: 60px;
+    }
+    .toast.hiding { animation: slideOut 0.4s ease forwards; }
+    .toast-success { border-left-color: #10b981; }
+    .toast-error { border-left-color: #ef4444; }
+    .toast-info { border-left-color: #2563eb; }
+    .toast-warning { border-left-color: #f59e0b; }
+
+    .toast-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .toast-success .toast-icon { background: #d1fae5; color: #059669; }
+    .toast-error .toast-icon { background: #fee2e2; color: #dc2626; }
+    .toast-info .toast-icon { background: #dbeafe; color: #2563eb; }
+    .toast-warning .toast-icon { background: #fef3c7; color: #d97706; }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 0.9rem; color: #0f172a; }
+    .toast-message { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+    .toast-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+    .toast-close:hover { color: #475569; }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(120%); opacity: 0; }
+    }
+
+    /* ===== HERO (from indexGUI.html) ===== */
+    .hero-innovations {
+      background: white;
+      border-radius: 28px;
+      margin: 0 0 2rem 0;
+      padding: 2.5rem 3rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .innov-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .innov-text { flex: 1.2; }
+    .innov-text h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0f2b3a, #1e4a76);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.8rem;
+    }
+    .innov-text p {
+      font-size: 0.95rem;
+      color: #2c4c6e;
+      margin-bottom: 1.5rem;
+      max-width: 90%;
+    }
+    .platform-badges {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .badge-pill {
+      background: #f1f5f9;
+      border-radius: 60px;
+      padding: 0.2rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .badge-pill:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+    }
+    .badge-pill i { margin-right: 4px; }
+    .innov-image { flex: 0.8; text-align: center; animation: float 4s ease-in-out infinite; }
+    .innov-image img {
+      max-width: 100%;
+      border-radius: 24px;
+      background: white;
+      padding: 0.6rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    /* ===== SECTION HEADER (from indexGUI.html) ===== */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+      border-left: 6px solid #2563eb;
+      padding-left: 1rem;
+    }
+    .section-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0f2b3a;
+    }
+    .section-header h2 i { color: #2563eb; margin-right: 8px; }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      background: white;
+      border-radius: 28px;
+      padding: 2.5rem 3rem;
+      margin-bottom: 2rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 0.5rem;
+    }
+    .page-header h1 i { color: #2563eb; }
+    .page-header p {
+      color: #64748b;
+      font-size: 1rem;
+    }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 24px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -12px rgba(0, 0, 0, 0.1);
+      border-color: #2563eb;
+    }
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #1e3a8a;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 0.3rem;
+    }
+
+    /* ===== FILTER BAR ===== */
+    .filter-bar {
+      background: white;
+      border-radius: 60px;
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .filter-bar label {
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #1e3a8a;
+    }
+    .filter-bar select {
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      border: 1.5px solid #cbd5e1;
+      background: white;
+      font-family: "Inter", sans-serif;
+      min-width: 150px;
+      font-size: 0.85rem;
+      transition: all 0.25s ease;
+      outline: none;
+    }
+    .filter-bar select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .filter-bar .reset-btn {
+      background: #f1f5f9;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: #1e293b;
+      transition: 0.2s;
+    }
+    .filter-bar .reset-btn:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+    }
+    .filter-bar .filter-count {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #6b8a9e;
+    }
+
+    /* ===== CHART GRID ===== */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .chart-box {
+      background: white;
+      border-radius: 24px;
+      padding: 1.5rem 1.5rem 1rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .chart-box h4 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      margin-bottom: 0.8rem;
+      font-weight: 700;
+    }
+    .chart-box h4 i { margin-right: 6px; }
+    .chart-box canvas { max-height: 220px; max-width: 100%; }
+
+    .column-chart-wrapper {
+      grid-column: 1 / -1;
+    }
+    .chart-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .chart-tabs button {
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #475569;
+      transition: 0.2s;
+    }
+    .chart-tabs button.active {
+      background: #1e3a8a;
+      color: white;
+      border-color: #1e3a8a;
+      box-shadow: 0 2px 8px rgba(30, 58, 138, 0.2);
+    }
+    .chart-tabs button:hover:not(.active) {
+      background: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    /* ===== TABLE SECTION ===== */
+    .table-section {
+      background: white;
+      border-radius: 24px;
+      padding: 1.5rem 1.5rem 1.5rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      margin-bottom: 2rem;
+      overflow-x: auto;
+    }
+    .table-section h4 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    .table-section h4 i { margin-right: 6px; }
+    .lgu-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    .lgu-table th {
+      background: #f8fafc;
+      padding: 0.8rem 0.6rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      text-align: left;
+      white-space: nowrap;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .lgu-table td {
+      padding: 0.6rem 0.6rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .lgu-table tr:hover td {
+      background: #fafdff;
+      cursor: pointer;
+    }
+
+    /* ===== BADGES ===== */
+    .badge-status {
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .badge-updated { background: #dcfce7; color: #166534; }
+    .badge-due { background: #fef3c7; color: #92400e; }
+    .badge-none { background: #fee2e2; color: #991b1b; }
+    .badge-other { background: #f1f5f9; color: #475569; }
+    .badge-under-review { background: #dbeafe; color: #1e40af; }
+
+    .btn-view {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: none;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-view:hover {
+      background: #b8dfff;
+      transform: translateY(-1px);
+    }
+
+    /* ===== DETAIL MODAL (from indexGUI.html) ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-box {
+      background: white;
+      border-radius: 24px;
+      max-width: 750px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      border-radius: 24px 24px 0 0;
+    }
+    .modal-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-header h2 i { color: white; }
+    .modal-header .close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .modal-header .close-btn:hover {
+      background: rgba(255,255,255,0.4);
+      transform: rotate(90deg);
+    }
+    .modal-body {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-footer {
+      padding: 1rem 2rem;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: #f8fafc;
+      border-radius: 0 0 24px 24px;
+    }
+    .modal-footer .btn-close-modal {
+      background: #2563eb;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85rem;
+    }
+    .modal-footer .btn-close-modal:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .detail-row {
+      display: flex;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .detail-label {
+      width: 200px;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .detail-value {
+      flex: 1;
+      font-size: 0.85rem;
+      color: #0f172a;
+    }
+
+    /* ===== LOGIN MODAL (from indexGUI.html) ===== */
+    .login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .login-modal.active { display: flex; }
+    .login-modal-content {
+      background: white;
+      border-radius: 2.5rem;
+      max-width: 440px;
+      width: 92%;
+      overflow: hidden;
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.4);
+      animation: fadeUp 0.3s ease;
+    }
+    .login-modal-brand {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+    .login-modal-brand img {
+      width: 110px;
+      height: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      display: inline-block;
+      margin-bottom: 0.6rem;
+    }
+    .login-modal-brand h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.1rem; }
+    .login-modal-brand p { font-size: 0.7rem; opacity: 0.85; }
+    .login-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: 0.2s;
+    }
+    .login-modal-close:hover { opacity: 1; transform: scale(1.1); }
+    .login-modal-body { padding: 1.8rem 1.8rem 1.2rem; }
+    .login-modal-body .input-group { margin-bottom: 1rem; }
+    .login-modal-body .input-group label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #54708f;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.3px;
+    }
+    .login-modal-body .input-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .login-modal-body .input-group input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .login-submit-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 1.2rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .login-submit-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .login-submit-btn:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+    .login-modal-footer {
+      text-align: center;
+      font-size: 0.6rem;
+      color: #94a3b8;
+      padding: 0.4rem 0 1rem;
+      border-top: 1px solid #eef2ff;
+      margin: 0 1.8rem;
+    }
+
+    /* ===== FOOTER (from indexGUI.html) ===== */
+    .footer-new {
+      background: #0a2540;
+      color: #b9d0e7;
+      padding: 2rem 0;
+      margin-top: 3rem;
+      border-top: 1px solid #2d4f6e;
+      width: 100%;
+    }
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .social-icons i {
+      font-size: 1.6rem;
+      margin-right: 0.8rem;
+      color: white;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .social-icons i:hover {
+      transform: translateY(-4px);
+      color: #3b82f6;
+    }
+    .footer-new .logo-image {
+      height: 40px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      margin-bottom: 12px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .app-header { flex-wrap: wrap; gap: 0.5rem; padding: 0.6rem 1rem; }
+      .nav-links { flex: 1 1 100%; justify-content: center; order: 2; }
+      .user-menu-section { order: 3; justify-content: center; width: 100%; }
+      .brand { order: 1; }
+    }
+    @media (max-width: 800px) {
+      .app-header { flex-direction: column; align-items: stretch; padding: 0.6rem 1rem; }
+      .nav-links { flex-wrap: wrap; justify-content: center; order: 2; }
+      .user-menu-section { justify-content: center; margin-top: 0.3rem; order: 3; width: 100%; }
+      .brand { order: 1; justify-content: center; }
+      .hero-innovations { padding: 1.5rem; }
+      .innov-grid { flex-direction: column; }
+      .innov-text p { max-width: 100%; }
+      .innov-image { flex: 1; }
+      .page-header { padding: 1.5rem; }
+      .page-header h1 { font-size: 1.5rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .chart-grid { grid-template-columns: 1fr; }
+      .filter-bar { flex-direction: column; align-items: stretch; border-radius: 28px; padding: 1rem; }
+      .filter-bar select { min-width: 100%; }
+      .filter-bar .reset-btn { width: 100%; justify-content: center; }
+      .filter-bar .filter-count { margin-left: 0; text-align: center; margin-top: 0.3rem; }
+      .modal-box { max-width: 100%; margin: 0.5rem; }
+      .modal-body { padding: 1rem; }
+      .login-modal-brand img { width: 90px; }
+      .brand span { font-size: 0.9rem; }
+      .brand img { height: 34px; }
+      .detail-row { flex-direction: column; }
+      .detail-label { width: 100%; }
+    }
+    @media (max-width: 500px) {
+      .container { padding: 0 12px; }
+      .hero-innovations { padding: 1rem; margin: 1rem 0; }
+      .innov-text h1 { font-size: 1.6rem; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== HEADER (from indexGUI.html) ===== -->
+<div class="app-header">
+  <div class="brand">
+    <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+    <div>
+      <span>DHSUD VI - ELUPDD</span>
+      <small>CLUP & ZO Integrated System</small>
+    </div>
+  </div>
+  <div class="nav-links" id="mainNavContainer">
+    <!-- Dynamically rendered -->
+  </div>
+  <div class="user-menu-section" id="userMenuContainer">
+    <!-- Dynamically rendered -->
+  </div>
+</div>
+
+<main>
+  <div class="container">
+    <!-- ===== HERO (from indexGUI.html) ===== -->
+    <div class="hero-innovations">
+      <div class="innov-grid">
+        <div class="innov-text">
+          <h1>CLUP/ZO Formulation Dashboard</h1>
+          <p>Real‑time monitoring · LGU status & progress · Track Comprehensive Land Use Plan and Zoning Ordinance formulation across Region VI.</p>
+          <div class="platform-badges">
+            <span class="badge-pill"><i class="fas fa-check-circle"></i> Updated</span>
+            <span class="badge-pill"><i class="fas fa-clock"></i> For Updating</span>
+            <span class="badge-pill"><i class="fas fa-search"></i> Under Review</span>
+            <span class="badge-pill"><i class="fas fa-chart-bar"></i> Analytics</span>
+          </div>
+        </div>
+        <div class="innov-image">
+          <img src="img/ELUPDD.png" alt="ELUPDD Official Logo" onerror="this.style.display='none'" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STATS ===== -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-number" id="statTotalLgu">0</div>
+        <div class="stat-label"><i class="fas fa-city"></i> No. of LGUs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="statUpdated">0</div>
+        <div class="stat-label"><i class="fas fa-check-circle" style="color:#16a34a;"></i> Updated CLUP/ZO</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="statDue">0</div>
+        <div class="stat-label"><i class="fas fa-clock" style="color:#f59e0b;"></i> CLUPs Due for Updating</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="statUnderReview">0</div>
+        <div class="stat-label"><i class="fas fa-search" style="color:#3b82f6;"></i> Under Review</div>
+      </div>
+    </div>
+
+    <!-- ===== FILTERS ===== -->
+    <div class="filter-bar">
+      <label><i class="fas fa-filter"></i> Filter</label>
+      <select id="filterProvince"><option value="">All Provinces</option></select>
+      <select id="filterLgu"><option value="">All LGUs</option></select>
+      <button class="reset-btn" id="resetFiltersBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+      <span class="filter-count" id="filterCount"></span>
+    </div>
+
+    <!-- ===== CHARTS ===== -->
+    <div class="chart-grid">
+      <div class="chart-box">
+        <h4><i class="fas fa-chart-pie" style="color:#2563eb;"></i> CLUP Status</h4>
+        <canvas id="pieChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h4><i class="fas fa-chart-bar" style="color:#2563eb;"></i> CLUP Status/Updates Breakdown</h4>
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+
+    <!-- ===== COLUMN CHART ===== -->
+    <div class="chart-box column-chart-wrapper">
+      <h4><i class="fas fa-chart-column" style="color:#2563eb;"></i> Formulation Phase & Review Status</h4>
+      <div class="chart-tabs" id="columnTabs">
+        <button class="active" data-view="preparatory"><i class="fas fa-clipboard-list"></i> Preparatory</button>
+        <button data-view="formulation"><i class="fas fa-pen-fancy"></i> Formulation</button>
+        <button data-view="review"><i class="fas fa-check-double"></i> Review & Approval</button>
+        <button data-view="unspecified"><i class="fas fa-question-circle"></i> Unspecified</button>
+      </div>
+      <canvas id="columnChart" style="max-height:220px;"></canvas>
+    </div>
+
+    <!-- ===== TABLE ===== -->
+    <div class="table-section">
+      <h4><i class="fas fa-table"></i> LGU Status List <span style="font-weight:400;font-size:0.7rem;color:#6b8a9e;">(from LGUstatus sheet)</span></h4>
+      <div style="overflow-x:auto;">
+        <table class="lgu-table" id="lguTable">
+          <thead>
+            <tr>
+              <th>Region</th>
+              <th>Province</th>
+              <th>City/Municipality</th>
+              <th>Income Class</th>
+              <th>CLUP Status</th>
+              <th>Target Year</th>
+              <th>Remarks</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="lguTableBody"><tr><td colspan="8" style="text-align:center; padding:2rem; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> Loading LGU data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2><i class="fas fa-file-alt"></i> LGU Status Details</h2>
+      <button class="close-btn" id="modalCloseBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-close-modal" id="modalCloseBtn2">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOGIN MODAL (from indexGUI.html) ===== -->
+<div id="loginModal" class="login-modal">
+  <div class="login-modal-content">
+    <div class="login-modal-brand">
+      <button class="login-modal-close" onclick="closeLoginModal()">&times;</button>
+      <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+      <h3>DHSUD Region VI</h3>
+      <p>ELUPDD · CLUP & ZO Platform</p>
+    </div>
+    <div class="login-modal-body">
+      <form id="modalLoginForm">
+        <div class="input-group">
+          <label><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" id="modalLoginEmail" placeholder="name@dhsud.gov.ph" required />
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="modalLoginPassword" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="login-submit-btn" id="loginModalBtn">→ Sign In</button>
+      </form>
+    </div>
+    <div class="login-modal-footer">🔐 Role-Based Access: Admin | Staff/Officer</div>
+  </div>
+</div>
+
+<!-- ===== FOOTER (from indexGUI.html) ===== -->
+<footer class="footer-new">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img src="img/DHSUD_LOGO.png" alt="logo" class="logo-image" /><br />
+        <strong>DHSUD Region VI</strong><br />ELUPDD – CLUP & ZO Platform<br />Geospatial Innovation for Resilience
+      </div>
+      <div>
+        <strong>Our Social Networks</strong><br />Follow us for updates<br />
+        <div class="social-icons">
+          <a href="https://web.facebook.com/DHSUDR6" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook"></i></a>
+          <i class="fab fa-instagram"></i><i class="fab fa-twitter"></i>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2rem; border-top:1px solid #2d4f6e; padding-top:1rem">© 2026 DHSUD VI — ELUPDD</div>
+  </div>
+</footer>
+
+<script>
+// ============================================
+// TOAST NOTIFICATION SYSTEM (from indexGUI.html)
+// ============================================
+function showToast(title, message, type = 'info', duration = 4000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  const icons = {
+    success: 'fa-check-circle',
+    error: 'fa-times-circle',
+    warning: 'fa-exclamation-triangle',
+    info: 'fa-info-circle'
+  };
+  
+  toast.innerHTML = `
+    <div class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+  `;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+  
+  return toast;
+}
+
+// ============================================
+// CONFIGURATION
+// ============================================
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwo4bJ6qkDy7HkB4IMRu4y1E0JKHgSF9IZFilJbjeNNUdYkIfg-iv7AuZB3p6vd9Q/exec";
+let currentUser = null;
+let rawLguData = [];
+let filteredData = [];
+let pieChartInstance = null;
+let barChartInstance = null;
+let columnChartInstance = null;
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function escapeHtml(s) { if (!s) return ""; return String(s).replace(/[&<>]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;" })[m]); }
+function encodePassword(p) { return btoa(p); }
+
+// ============================================
+// FIELD ACCESS HELPERS
+// ============================================
+function getField(record, field) {
+  if (!record) return "—";
+  if (record[field] !== undefined && record[field] !== null && record[field] !== "") {
+    return record[field];
+  }
+  for (let key of Object.keys(record)) {
+    if (key.trim() === field.trim()) {
+      return record[key];
+    }
+  }
+  const lowerField = field.toLowerCase().trim();
+  for (let key of Object.keys(record)) {
+    if (key.toLowerCase().trim() === lowerField) {
+      return record[key];
+    }
+  }
+  for (let key of Object.keys(record)) {
+    const keyLower = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const fieldLower = field.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (keyLower === fieldLower || keyLower.includes(fieldLower) || fieldLower.includes(keyLower)) {
+      return record[key];
+    }
+  }
+  return "—";
+}
+
+function deriveClupStatus(record) {
+  let status = getField(record, "CLUP Status");
+  if (status === "—" || status === "") status = getField(record, "CLUPStatus/Updates");
+  if (status === "—" || status === "") status = getField(record, "PDPFP/CLUP Status");
+  if (status === "—" || status === "") status = getField(record, "Status");
+  if (status === "—" || status === "") status = "Unknown";
+  return status;
+}
+
+function deriveTargetYear(record) {
+  const start = getField(record, "Start Year");
+  const end = getField(record, "End Year");
+  if (start !== "—" && end !== "—") return `${start}-${end}`;
+  if (start !== "—") return start;
+  if (end !== "—") return end;
+  return "—";
+}
+
+function normalizeStatus(status) {
+  if (!status) return "Other";
+  const s = String(status).toLowerCase().trim();
+  if (s === "updated" || s.includes("updated") || s === "yes") return "Updated";
+  if (s === "for updating" || s === "forupdating" || s.includes("for updating") || s.includes("due for") || s === "due") return "For updating";
+  if (s === "under review" || s === "underreview" || s.includes("under review") || s.includes("review")) return "Under Review";
+  if (s === "no clup" || s.includes("no clup") || s === "none" || s === "no") return "No CLUP";
+  return "Other";
+}
+
+function getPhaseCategory(phaseName) {
+  const phaseMap = {
+    "Preparatory phase": "Preparatory",
+    "Phase 1": "Formulation",
+    "Phase 2": "Formulation",
+    "Phase 3": "Formulation",
+    "Phase 4": "Formulation",
+    "Phase 5": "Formulation",
+    "RA 1": "Review & Approval",
+    "RA 2": "Review & Approval",
+    "RA 3": "Review & Approval",
+    "RA 4": "Review & Approval",
+    "RA 5": "Review & Approval",
+    "RA 6": "Review & Approval",
+    "RA 7": "Review & Approval"
+  };
+  const key = phaseName?.trim() || "";
+  for (let [k, v] of Object.entries(phaseMap)) {
+    if (key.includes(k) || k.includes(key)) return v;
+  }
+  return "Unspecified";
+}
+
+// ============================================
+// SESSION MANAGEMENT (from indexGUI.html)
+// ============================================
+function checkSession() {
+  const raw = localStorage.getItem("dhsud_session");
+  if (raw) {
+    try {
+      const s = JSON.parse(raw);
+      const diff = (new Date() - new Date(s.loggedInAt)) / (1000 * 60 * 60);
+      if (diff < 12 && s.email) {
+        currentUser = s;
+        return true;
+      } else localStorage.removeItem("dhsud_session");
+    } catch(e) { localStorage.removeItem("dhsud_session"); }
+  }
+  currentUser = null;
+  return false;
+}
+
+function getUserInitials(n) { if (!n) return "U"; let p = n.split(" "); if (p.length >= 2) return (p[0][0] + p[1][0]).toUpperCase(); return n.substring(0,2).toUpperCase(); }
+function getRoleLabel(r) { if (r === "admin") return "👑 Admin"; if (r === "encoder" || r === "staff") return "📋 Staff/Officer"; return "👁️ Viewer"; }
+function getRoleClass(r) { if (r === "admin") return "admin"; if (r === "encoder" || r === "staff") return "staff"; return "viewer"; }
+
+// ============================================
+// RENDER NAVIGATION & USER MENU (from indexGUI.html)
+// ============================================
+function renderMainNavigation() {
+  const container = document.getElementById("mainNavContainer");
+  if (!container) return;
+  let navHtml = `<a href="index.html"><i class="fas fa-home"></i> Home</a>`;
+  if (currentUser) {
+    navHtml += `
+      <div class="dropdown">
+        <button class="dropbtn">Certification</button>
+        <div class="dropdown-content">
+          <a href="lc.html">Locational Clearance</a>
+          <a href="SZC.html">Site Zoning Certification</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn">Land Use Plans</button>
+        <div class="dropdown-content">
+          <div class="dropdown-submenu">
+            <button class="submenu-trigger">CLUP & ZO <span class="arrow-right">▸</span></button>
+            <div class="submenu-content">
+              <a href="inventory.html">Inventory</a>
+              <a href="status.html" class="active">Status</a>
+            </div>
+          </div>
+          <a href="status.html">PDPFP</a>
+        </div>
+      </div>
+      <a href="Techsamp.html"><i class="fas fa-headset"></i> Technical Assistance</a>
+      <a href="lgu-info.html"><i class="fas fa-city"></i> LGU Information</a>
+      <a href="report.html"><i class="fas fa-chart-pie"></i> Reports</a>
+      <a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a>
+      <a href="issuance.html"><i class="fas fa-file-alt"></i> Issuances</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    `;
+  } else {
+    navHtml += `<a href="#about">About</a><a href="#contact">Contact</a>`;
+  }
+  container.innerHTML = navHtml;
+  setTimeout(() => {
+    document.querySelectorAll(".dropdown-submenu .submenu-trigger").forEach((trigger) => {
+      trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const submenu = trigger.closest(".dropdown-submenu");
+        if (submenu) submenu.classList.toggle("open");
+      });
+    });
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".dropdown-submenu")) {
+        document.querySelectorAll(".dropdown-submenu.open").forEach((s) => s.classList.remove("open"));
+      }
+    });
+  }, 10);
+}
+
+function renderUserMenu() {
+  const container = document.getElementById("userMenuContainer");
+  if (!container) return;
+  if (currentUser) {
+    const initials = getUserInitials(currentUser.fullName);
+    const firstName = currentUser.fullName?.split(" ")[0] || "User";
+    const roleLabel = getRoleLabel(currentUser.role);
+    const roleClass = getRoleClass(currentUser.role);
+    container.innerHTML = `
+      <div class="user-menu" id="userMenuDropdown" style="position:relative;">
+        <div class="user-avatar">${initials}</div>
+        <span class="user-name">${escapeHtml(firstName)}</span>
+        <span class="role-badge-header ${roleClass}">${roleLabel}</span>
+        <span style="font-size:0.6rem;">▼</span>
+        <div class="user-dropdown-menu">
+          <div class="user-dropdown-item">👤 ${escapeHtml(currentUser.email)}</div>
+          <div class="user-dropdown-item">🏢 ${escapeHtml(currentUser.office || "ELUPDD")}</div>
+          ${currentUser.role === "admin" ? `<div class="user-dropdown-item" id="adminConsoleLink">⚙️ Manage Users</div>` : ""}
+          <div class="user-dropdown-item" id="logoutDropdownBtn" style="color:#dc2626;">🚪 Sign Out</div>
+        </div>
+      </div>
+    `;
+    const userDiv = document.getElementById("userMenuDropdown");
+    if (userDiv) {
+      userDiv.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const menu = userDiv.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = menu.style.display === "block" ? "none" : "block";
+      });
+      document.addEventListener("click", () => {
+        const menu = userDiv?.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = "none";
+      });
+    }
+    if (currentUser.role === "admin") {
+      const adminBtn = document.getElementById("adminConsoleLink");
+      if (adminBtn) adminBtn.addEventListener("click", () => (window.location.href = "admin.html"));
+    }
+    const logoutBtn = document.getElementById("logoutDropdownBtn");
+    if (logoutBtn) logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("dhsud_session");
+      showToast("Logged Out", "You have been logged out successfully.", "info");
+      setTimeout(() => { window.location.href = "status.html"; }, 700);
+    });
+  } else {
+    container.innerHTML = `<div class="login-prompt" onclick="openLoginModal()"><i class="fas fa-sign-in-alt"></i> Sign In</div>`;
+  }
+}
+
+// ============================================
+// LOGIN MODAL (from indexGUI.html)
+// ============================================
+function openLoginModal() {
+  document.getElementById("loginModal").classList.add("active");
+}
+function closeLoginModal() {
+  document.getElementById("loginModal").classList.remove("active");
+}
+async function handleModalLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById("modalLoginEmail").value.trim().toLowerCase();
+  const password = document.getElementById("modalLoginPassword").value;
+  const btn = document.getElementById("loginModalBtn");
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Authenticating...";
+  try {
+    const resp = await fetch(`${GOOGLE_SCRIPT_URL}?action=get&data_type=users&_=${Date.now()}`);
+    const users = await resp.json();
+    const user = users.find((u) => u.email?.toLowerCase() === email);
+    if (!user) { showToast("Authentication Failed", "Account not found.", "error"); btn.innerHTML = originalText; btn.disabled = false; return false; }
+    if (user.password === encodePassword(password)) {
+      const session = { userId: user.id, email: user.email, fullName: user.fullName, office: user.office || "ELUPDD", role: user.role, loggedInAt: new Date().toISOString() };
+      localStorage.setItem("dhsud_session", JSON.stringify(session));
+      showToast("Welcome", `Welcome ${user.fullName?.split(" ")[0] || ""}!`, "success");
+      closeLoginModal();
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showToast("Authentication Failed", "Invalid password.", "error");
+    }
+  } catch (error) {
+    showToast("Connection Error", "Please try again.", "error");
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+  return false;
+}
+
+// ============================================
+// CHART DATA FUNCTIONS
+// ============================================
+function getPieData(records) {
+  const statusMap = { "Updated": 0, "For updating": 0, "Under Review": 0 };
+  records.forEach(r => {
+    const status = deriveClupStatus(r);
+    const st = normalizeStatus(status);
+    if (st === "Updated") {
+      statusMap["Updated"]++;
+    } else if (st === "For updating") {
+      statusMap["For updating"]++;
+    } else {
+      statusMap["Under Review"]++;
+    }
+  });
+  return { labels: Object.keys(statusMap), data: Object.values(statusMap) };
+}
+
+function getBarData(records) {
+  const categories = ["None Indicated", "Phase 5", "Pre-Phase", "RA3", "RA5", "RA7"];
+  const counts = { "None Indicated": 0, "Phase 5": 0, "Pre-Phase": 0, "RA3": 0, "RA5": 0, "RA7": 0 };
+  records.forEach(r => {
+    const clupUpdates = String(getField(r, "CLUPStatus/Updates") || "").toLowerCase();
+    const clupStatus = String(getField(r, "CLUP Status") || "").toLowerCase();
+    const combined = clupUpdates + " " + clupStatus;
+    let matched = false;
+    if (combined.includes("phase 5") || combined.includes("phase5")) {
+      counts["Phase 5"]++;
+      matched = true;
+    } else if (combined.includes("pre-phase") || combined.includes("prephase") || combined.includes("pre phase")) {
+      counts["Pre-Phase"]++;
+      matched = true;
+    } else if (combined.includes("ra3") || combined.includes("ra 3")) {
+      counts["RA3"]++;
+      matched = true;
+    } else if (combined.includes("ra5") || combined.includes("ra 5")) {
+      counts["RA5"]++;
+      matched = true;
+    } else if (combined.includes("ra7") || combined.includes("ra 7")) {
+      counts["RA7"]++;
+      matched = true;
+    }
+    if (!matched) {
+      counts["None Indicated"]++;
+    }
+  });
+  return { labels: categories, data: categories.map(c => counts[c] || 0) };
+}
+
+function getColumnData(records, view) {
+  const phaseCounts = {};
+  const allPhases = ["Preparatory phase", "Phase 1", "Phase 2", "Phase 3", "Phase 4", "Phase 5",
+                     "RA 1", "RA 2", "RA 3", "RA 4", "RA 5", "RA 6", "RA 7"];
+  allPhases.forEach(p => phaseCounts[p] = 0);
+  
+  records.forEach(r => {
+    const clupUpdates = String(getField(r, "CLUPStatus/Updates") || "").toLowerCase();
+    const clupStatus = String(getField(r, "CLUP Status") || "").toLowerCase();
+    const combined = clupUpdates + " " + clupStatus;
+    let found = false;
+    for (let p of allPhases) {
+      const pLower = p.toLowerCase();
+      if (combined.includes(pLower) || pLower.includes(combined.substring(0, Math.min(combined.length, 10)))) {
+        phaseCounts[p] = (phaseCounts[p]||0) + 1;
+        found = true; break;
+      }
+    }
+    if (!found) {
+      const remark = String(getField(r, "Remarks")||"").toLowerCase();
+      for (let p of allPhases) {
+        if (remark.includes(p.toLowerCase())) {
+          phaseCounts[p] = (phaseCounts[p]||0) + 1;
+          found = true; break;
+        }
+      }
+    }
+    if (!found) {
+      phaseCounts["Unspecified"] = (phaseCounts["Unspecified"]||0) + 1;
+    }
+  });
+  
+  const viewMap = {
+    "preparatory": ["Preparatory phase"],
+    "formulation": ["Phase 1", "Phase 2", "Phase 3", "Phase 4", "Phase 5"],
+    "review": ["RA 1", "RA 2", "RA 3", "RA 4", "RA 5", "RA 6", "RA 7"],
+    "unspecified": ["Unspecified"]
+  };
+  const target = viewMap[view] || viewMap["preparatory"];
+  return { labels: target, values: target.map(p => phaseCounts[p]||0) };
+}
+
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
+function renderStats(records) {
+  const total = records.length;
+  let updated = 0, due = 0, underReview = 0;
+  records.forEach(r => {
+    const status = deriveClupStatus(r);
+    const st = normalizeStatus(status);
+    if (st === "Updated") updated++;
+    else if (st === "For updating") due++;
+    else underReview++;
+  });
+  document.getElementById("statTotalLgu").innerText = total;
+  document.getElementById("statUpdated").innerText = updated;
+  document.getElementById("statDue").innerText = due;
+  document.getElementById("statUnderReview").innerText = underReview;
+}
+
+function renderPie(records) {
+  const data = getPieData(records);
+  const ctx = document.getElementById("pieChart").getContext("2d");
+  if (pieChartInstance) pieChartInstance.destroy();
+  pieChartInstance = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: data.labels,
+      datasets: [{
+        data: data.data,
+        backgroundColor: ['#16a34a', '#f59e0b', '#3b82f6']
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+  });
+}
+
+function renderBar(records) {
+  const data = getBarData(records);
+  const ctx = document.getElementById("barChart").getContext("2d");
+  if (barChartInstance) barChartInstance.destroy();
+  const colors = ['#94a3b8', '#8b5cf6', '#3b82f6', '#f59e0b', '#ef4444', '#06b6d4'];
+  barChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: 'Count',
+        data: data.data,
+        backgroundColor: colors,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, stepSize: 1 } }
+    }
+  });
+}
+
+function renderColumn(records, view = 'preparatory') {
+  const data = getColumnData(records, view);
+  const ctx = document.getElementById("columnChart").getContext("2d");
+  if (columnChartInstance) columnChartInstance.destroy();
+  const phaseColors = {
+    "Preparatory": "#3b82f6",
+    "Formulation": "#8b5cf6",
+    "Review & Approval": "#f59e0b",
+    "Unspecified": "#94a3b8"
+  };
+  const colors = data.labels.map(l => phaseColors[getPhaseCategory(l)] || '#94a3b8');
+  columnChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: 'Count',
+        data: data.values,
+        backgroundColor: colors,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, stepSize: 1 } }
+    }
+  });
+}
+
+function renderTable(records) {
+  const tbody = document.getElementById("lguTableBody");
+  if (!records || records.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:#94a3b8;">No LGU records found in LGUstatus sheet.</td></tr>`;
+    return;
+  }
+  let html = '';
+  records.forEach(r => {
+    const region = getField(r, "Region") || "—";
+    const province = getField(r, "Province") || "—";
+    const municipality = getField(r, "City/Municipality") || "—";
+    const income = getField(r, "Income Class") || "—";
+    const status = deriveClupStatus(r) || "—";
+    const target = deriveTargetYear(r) || "—";
+    const remarks = getField(r, "Remarks") || "";
+    
+    const normalized = normalizeStatus(status);
+    const statusClass = normalized === "Updated" ? "badge-updated" :
+                        normalized === "For updating" ? "badge-due" :
+                        normalized === "Under Review" ? "badge-under-review" : "badge-other";
+    
+    html += `<tr>
+      <td>${escapeHtml(region)}</td>
+      <td>${escapeHtml(province)}</td>
+      <td><strong>${escapeHtml(municipality)}</strong></td>
+      <td>${escapeHtml(income)}</td>
+      <td><span class="badge-status ${statusClass}">${escapeHtml(status)}</span></td>
+      <td>${escapeHtml(target)}</td>
+      <td style="max-width:120px; font-size:0.75rem;">${escapeHtml(remarks)}</td>
+      <td><button class="btn-view" data-record='${JSON.stringify(r).replace(/'/g, "&#39;")}'><i class="fas fa-eye"></i> View</button></td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+  
+  tbody.querySelectorAll('.btn-view').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const record = JSON.parse(this.dataset.record);
+      showDetailModal(record);
+    });
+  });
+  document.getElementById("filterCount").innerText = `${records.length} LGUs shown`;
+}
+
+function showDetailModal(record) {
+  const modal = document.getElementById("detailModal");
+  const body = document.getElementById("modalBody");
+  
+  const fields = [
+    { label: "Region", key: "Region" },
+    { label: "Income Class", key: "Income Class" },
+    { label: "PSGC", key: "PSGC" },
+    { label: "City/Municipality", key: "City/Municipality" },
+    { label: "Province", key: "Province" },
+    { label: "Start Year", key: "Start Year" },
+    { label: "End Year", key: "End Year" },
+    { label: "Resolution Number", key: "Resolution Number of the Latest Plan" },
+    { label: "Approval Date", key: "Approval date of the Latest plan (MM/DD/YYYY)" },
+    { label: "CLUP Status", key: "CLUP Status" },
+    { label: "CLUPStatus/Updates", key: "CLUPStatus/Updates" },
+    { label: "Technical Assistance", key: "Technical Assistance Provided" },
+    { label: "Support from Other Institutions", key: "Support from Other Institutions" },
+    { label: "Name/s of Institutions", key: "If with Support from other institutions, Name/s of Institutions" },
+    { label: "Local Shelter Plan", key: "LGU with Local Shelter Plan" },
+    { label: "Communications Plan", key: "LGU with Communications Plan" },
+    { label: "Remarks", key: "Remarks" }
+  ];
+  
+  let html = '';
+  fields.forEach(f => {
+    const value = getField(record, f.key);
+    html += `<div class="detail-row">
+      <div class="detail-label">${f.label}</div>
+      <div class="detail-value">${escapeHtml(value)}</div>
+    </div>`;
+  });
+  body.innerHTML = html;
+  modal.classList.add('active');
+}
+
+// ============================================
+// FILTER FUNCTIONS
+// ============================================
+function populateFilters(records) {
+  const provinceSet = new Set();
+  const lguSet = new Set();
+  records.forEach(r => {
+    const p = getField(r, "Province") || "—";
+    const m = getField(r, "City/Municipality") || "—";
+    if (p !== "—") provinceSet.add(p);
+    if (m !== "—") lguSet.add(m);
+  });
+  const provSelect = document.getElementById("filterProvince");
+  const lguSelect = document.getElementById("filterLgu");
+  const currentProv = provSelect.value;
+  const currentLgu = lguSelect.value;
+  provSelect.innerHTML = `<option value="">All Provinces</option>` + [...provinceSet].sort().map(p => `<option value="${p}">${p}</option>`).join('');
+  lguSelect.innerHTML = `<option value="">All LGUs</option>` + [...lguSet].sort().map(m => `<option value="${m}">${m}</option>`).join('');
+  if (currentProv) provSelect.value = currentProv;
+  if (currentLgu) lguSelect.value = currentLgu;
+}
+
+function applyFilters() {
+  const prov = document.getElementById("filterProvince").value;
+  const lgu = document.getElementById("filterLgu").value;
+  let filtered = rawLguData;
+  if (prov) filtered = filtered.filter(r => (getField(r, "Province") || "") === prov);
+  if (lgu) filtered = filtered.filter(r => (getField(r, "City/Municipality") || "") === lgu);
+  filteredData = filtered;
+  renderStats(filtered);
+  renderPie(filtered);
+  renderBar(filtered);
+  const activeView = document.querySelector('#columnTabs .active')?.dataset.view || 'preparatory';
+  renderColumn(filtered, activeView);
+  renderTable(filtered);
+}
+
+// ============================================
+// FETCH DATA
+// ============================================
+async function fetchLguStatusData() {
+  try {
+    const resp = await fetch(`${GOOGLE_SCRIPT_URL}?action=get&data_type=lgu_status&_=${Date.now()}`);
+    const data = await resp.json();
+    if (Array.isArray(data) && data.length > 0) {
+      console.log("📋 Loaded LGU Status records:", data.length);
+      return data;
+    } else {
+      console.warn("No data from LGUstatus, using fallback");
+      return getFallbackData();
+    }
+  } catch(e) {
+    console.error("Fetch error", e);
+    return getFallbackData();
+  }
+}
+
+function getFallbackData() {
+  return [
+    { "Region": "Region VI", "Income Class": "1st", "PSGC": "604010000", "City/Municipality": "Bacolod City", "Province": "Negros Occidental", "Start Year": "2020", "End Year": "2029", "Resolution Number of the Latest Plan": "R-2020-001", "Approval date of the Latest plan (MM/DD/YYYY)": "01/15/2021", "CLUP Status": "Updated", "CLUPStatus/Updates": "Updated", "Technical Assistance Provided": "Yes", "Support from Other Institutions": "Yes", "If with Support from other institutions, Name/s of Institutions": "NEDA, DILG", "LGU with Local Shelter Plan": "Yes", "LGU with Communications Plan": "Yes", "Remarks": "On track" },
+    { "Region": "Region VI", "Income Class": "2nd", "PSGC": "604020000", "City/Municipality": "Bago City", "Province": "Negros Occidental", "Start Year": "2018", "End Year": "2027", "Resolution Number of the Latest Plan": "R-2018-005", "Approval date of the Latest plan (MM/DD/YYYY)": "03/10/2019", "CLUP Status": "For updating", "CLUPStatus/Updates": "Phase 5", "Technical Assistance Provided": "No", "Support from Other Institutions": "No", "If with Support from other institutions, Name/s of Institutions": "", "LGU with Local Shelter Plan": "No", "LGU with Communications Plan": "Yes", "Remarks": "Tech capacity needed" },
+    { "Region": "Region VI", "Income Class": "3rd", "PSGC": "604030000", "City/Municipality": "Cadiz City", "Province": "Negros Occidental", "Start Year": "2019", "End Year": "2028", "Resolution Number of the Latest Plan": "R-2019-003", "Approval date of the Latest plan (MM/DD/YYYY)": "06/20/2020", "CLUP Status": "Updated", "CLUPStatus/Updates": "Pre-Phase", "Technical Assistance Provided": "Yes", "Support from Other Institutions": "Yes", "If with Support from other institutions, Name/s of Institutions": "DILG", "LGU with Local Shelter Plan": "Yes", "LGU with Communications Plan": "Yes", "Remarks": "Data gaps identified" },
+    { "Region": "Region VI", "Income Class": "4th", "PSGC": "603001000", "City/Municipality": "Ajuy", "Province": "Iloilo", "Start Year": "2017", "End Year": "2026", "Resolution Number of the Latest Plan": "R-2017-002", "Approval date of the Latest plan (MM/DD/YYYY)": "08/15/2018", "CLUP Status": "For updating", "CLUPStatus/Updates": "RA3", "Technical Assistance Provided": "Yes", "Support from Other Institutions": "No", "If with Support from other institutions, Name/s of Institutions": "", "LGU with Local Shelter Plan": "No", "LGU with Communications Plan": "No", "Remarks": "Financial support needed" },
+    { "Region": "Region VI", "Income Class": "5th", "PSGC": "603002000", "City/Municipality": "Badiangan", "Province": "Iloilo", "Start Year": "2016", "End Year": "2025", "Resolution Number of the Latest Plan": "R-2016-001", "Approval date of the Latest plan (MM/DD/YYYY)": "12/10/2017", "CLUP Status": "No CLUP", "CLUPStatus/Updates": "RA5", "Technical Assistance Provided": "No", "Support from Other Institutions": "No", "If with Support from other institutions, Name/s of Institutions": "", "LGU with Local Shelter Plan": "No", "LGU with Communications Plan": "No", "Remarks": "Institutional barriers" },
+    { "Region": "Region VI", "Income Class": "4th", "PSGC": "603003000", "City/Municipality": "Altavas", "Province": "Aklan", "Start Year": "2021", "End Year": "2030", "Resolution Number of the Latest Plan": "R-2021-004", "Approval date of the Latest plan (MM/DD/YYYY)": "02/28/2022", "CLUP Status": "Updated", "CLUPStatus/Updates": "RA7", "Technical Assistance Provided": "Yes", "Support from Other Institutions": "Yes", "If with Support from other institutions, Name/s of Institutions": "NEDA", "LGU with Local Shelter Plan": "Yes", "LGU with Communications Plan": "Yes", "Remarks": "Ongoing monitoring" },
+    { "Region": "Region VI", "Income Class": "4th", "PSGC": "603004000", "City/Municipality": "Banga", "Province": "Aklan", "Start Year": "2020", "End Year": "2029", "Resolution Number of the Latest Plan": "R-2020-002", "Approval date of the Latest plan (MM/DD/YYYY)": "05/20/2021", "CLUP Status": "For updating", "CLUPStatus/Updates": "", "Technical Assistance Provided": "No", "Support from Other Institutions": "No", "If with Support from other institutions, Name/s of Institutions": "", "LGU with Local Shelter Plan": "No", "LGU with Communications Plan": "No", "Remarks": "No updates provided" }
+  ];
+}
+
+// ============================================
+// MODAL CONTROLS
+// ============================================
+document.getElementById("modalCloseBtn").addEventListener("click", function() {
+  document.getElementById("detailModal").classList.remove("active");
+});
+document.getElementById("modalCloseBtn2").addEventListener("click", function() {
+  document.getElementById("detailModal").classList.remove("active");
+});
+document.getElementById("detailModal").addEventListener("click", function(e) {
+  if (e.target === this) this.classList.remove("active");
+});
+
+// ============================================
+// INITIALIZATION
+// ============================================
+document.addEventListener("DOMContentLoaded", async function() {
+  checkSession();
+  renderMainNavigation();
+  renderUserMenu();
+  
+  const data = await fetchLguStatusData();
+  if (data.length > 0) {
+    rawLguData = data;
+  } else {
+    rawLguData = getFallbackData();
+  }
+  populateFilters(rawLguData);
+  applyFilters();
+  
+  document.getElementById("filterProvince").addEventListener('change', applyFilters);
+  document.getElementById("filterLgu").addEventListener('change', applyFilters);
+  document.getElementById("resetFiltersBtn").addEventListener('click', function() {
+    document.getElementById("filterProvince").value = "";
+    document.getElementById("filterLgu").value = "";
+    applyFilters();
+  });
+  
+  document.querySelectorAll('#columnTabs button').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#columnTabs button').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      renderColumn(filteredData, this.dataset.view);
+    });
+  });
+  
+  const form = document.getElementById("modalLoginForm");
+  if (form) form.addEventListener("submit", handleModalLogin);
+});
+
+// Expose functions globally
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
+</script>
+</body>
+</html>

@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DHSUD VI | ELUPDD - Released Reports Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    /* ===== BASE STYLES (from indexGUI.html) ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", "Segoe UI", Roboto, sans-serif; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 1.5rem 1.5rem 2rem;
+      background: #f4f7fc;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(26, 115, 232, 0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, rgba(0, 200, 150, 0.06) 0%, transparent 60%),
+                  linear-gradient(145deg, #f0f4f8 0%, #e8edf3 100%);
+      z-index: 0;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(25px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+      0% { opacity: 0; transform: translateX(-40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      0% { opacity: 0; transform: translateX(40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+    .animate-fadeUp { animation: fadeUp 0.7s ease forwards; }
+    .animate-slideLeft { animation: slideInLeft 0.6s ease forwards; }
+    .animate-slideRight { animation: slideInRight 0.6s ease forwards; }
+
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== HEADER / NAVIGATION (from indexGUI.html) ===== */
+    .app-header {
+      width: 100%;
+      max-width: 1280px;
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: white;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      position: relative;
+      z-index: 5;
+    }
+    .app-header .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .app-header .brand img {
+      height: 42px;
+      width: auto;
+      display: block;
+      border-radius: 8px;
+    }
+    .app-header .brand span {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #1e3a8a;
+      letter-spacing: -0.3px;
+    }
+    .app-header .brand small {
+      font-weight: 400;
+      font-size: 0.6rem;
+      color: #64748b;
+      display: block;
+      margin-top: -2px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Navigation links - center */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      flex: 1;
+      justify-content: center;
+    }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-decoration: none;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .nav-links a i { font-size: 0.8rem; }
+    .nav-links a:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .nav-links a.active {
+      background: #1e3a8a;
+      color: white;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+    .nav-links a.active:hover {
+      background: #2563eb;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropbtn {
+      background: none;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #1e3a8a;
+      background: transparent;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+    .dropbtn:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: white;
+      min-width: 210px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      z-index: 1000;
+      top: 36px;
+      left: 0;
+      border: 1px solid #eef2ff;
+      padding: 0.3rem 0;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 0.6rem 1.2rem;
+      color: #1e293b;
+      font-size: 0.75rem;
+      text-decoration: none;
+      border: none;
+      background: none;
+      border-radius: 0;
+    }
+    .dropdown-content a:hover {
+      background: #eff6ff;
+    }
+    .dropdown-submenu {
+      position: relative;
+    }
+    .submenu-trigger {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: inherit;
+    }
+    .submenu-trigger:hover { background: #eff6ff; }
+    .arrow-right { font-size: 0.7rem; margin-left: 1rem; }
+    .submenu-content {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: white;
+      min-width: 170px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      border: 1px solid #eef2ff;
+      z-index: 1001;
+      padding: 0.3rem 0;
+    }
+    .dropdown-submenu:hover .submenu-content {
+      display: block;
+    }
+    .submenu-content a { padding: 0.6rem 1.2rem; }
+    .dropbtn::after {
+      content: " ▾";
+      font-size: 0.6rem;
+      opacity: 0.6;
+    }
+    .dropdown:hover .dropbtn::after {
+      opacity: 1;
+    }
+
+    /* User menu - right side */
+    .user-menu-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.15rem 0.5rem 0.15rem 0.7rem;
+      border-radius: 60px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .user-menu:hover { background: #e2e8f0; }
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      background: #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .user-name {
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    .role-badge-header {
+      background: #e2e8f0;
+      padding: 0.1rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.55rem;
+      font-weight: 600;
+    }
+    .role-badge-header.admin { background: #dcfce7; color: #166534; }
+    .role-badge-header.staff { background: #dbeafe; color: #1e40af; }
+    .user-dropdown-menu {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: white;
+      border-radius: 20px;
+      min-width: 180px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+      border: 1px solid #eef2ff;
+      overflow: hidden;
+      display: none;
+      z-index: 200;
+    }
+    .user-dropdown-item {
+      padding: 0.7rem 1.2rem;
+      border-bottom: 1px solid #f1f5f9;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .user-dropdown-item:hover { background: #f8fafc; }
+    .login-prompt {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.2rem 0.8rem 0.2rem 1rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #1e3a8a;
+    }
+    .login-prompt:hover {
+      background: #2563eb;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* ===== TOAST NOTIFICATIONS (from indexGUI.html) ===== */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      width: 100%;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transform: translateX(120%);
+      animation: slideIn 0.5s ease forwards;
+      border-left: 5px solid #2563eb;
+      min-height: 60px;
+    }
+    .toast.hiding { animation: slideOut 0.4s ease forwards; }
+    .toast-success { border-left-color: #10b981; }
+    .toast-error { border-left-color: #ef4444; }
+    .toast-info { border-left-color: #2563eb; }
+    .toast-warning { border-left-color: #f59e0b; }
+
+    .toast-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .toast-success .toast-icon { background: #d1fae5; color: #059669; }
+    .toast-error .toast-icon { background: #fee2e2; color: #dc2626; }
+    .toast-info .toast-icon { background: #dbeafe; color: #2563eb; }
+    .toast-warning .toast-icon { background: #fef3c7; color: #d97706; }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 0.9rem; color: #0f172a; }
+    .toast-message { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+    .toast-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+    .toast-close:hover { color: #475569; }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(120%); opacity: 0; }
+    }
+
+    /* ===== HERO (from indexGUI.html) ===== */
+    .hero-innovations {
+      background: white;
+      border-radius: 28px;
+      margin: 0 0 2rem 0;
+      padding: 2.5rem 3rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .innov-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .innov-text { flex: 1.2; }
+    .innov-text h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0f2b3a, #1e4a76);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.8rem;
+    }
+    .innov-text p {
+      font-size: 0.95rem;
+      color: #2c4c6e;
+      margin-bottom: 1.5rem;
+      max-width: 90%;
+    }
+    .platform-badges {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .badge-pill {
+      background: #f1f5f9;
+      border-radius: 60px;
+      padding: 0.2rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .badge-pill:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: translateY(-2px);
+    }
+    .badge-pill i { margin-right: 4px; }
+    .innov-image { flex: 0.8; text-align: center; animation: float 4s ease-in-out infinite; }
+    .innov-image img {
+      max-width: 100%;
+      border-radius: 24px;
+      background: white;
+      padding: 0.6rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    /* ===== SECTION HEADER (from indexGUI.html) ===== */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+      border-left: 6px solid #2563eb;
+      padding-left: 1rem;
+    }
+    .section-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0f2b3a;
+    }
+    .section-header h2 i { color: #2563eb; margin-right: 8px; }
+
+    /* ===== CARD (from indexGUI.html) ===== */
+    .card {
+      background: white;
+      border-radius: 28px;
+      margin: 0 0 2rem 0;
+      padding: 2.5rem 3rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      max-width: 1280px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .card-header-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: white;
+      box-shadow: 0 8px 24px rgba(26, 115, 232, 0.3);
+    }
+    .card-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      letter-spacing: -0.5px;
+    }
+    .card-header h2 small {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: #64748b;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .card-header-badge {
+      background: rgba(0, 200, 150, 0.15);
+      border: 1px solid rgba(0, 200, 150, 0.2);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      color: #00c896;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-body {
+      padding: 0;
+    }
+
+    /* ===== FILTER GROUP ===== */
+    .filter-group {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .report-selector,
+    .month-filter {
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      border: 1.5px solid #cbd5e1;
+      background: white;
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.25s ease;
+      outline: none;
+      min-width: 180px;
+    }
+    .report-selector:focus,
+    .month-filter:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    /* ===== BUTTONS (from indexGUI.html) ===== */
+    .btn {
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -8px #2563eb70;
+    }
+    .btn-success {
+      background: #10b981;
+      color: white;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+    }
+    .btn-success:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -8px #10b98170;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #cbd5e1;
+      color: #475569;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      transform: translateY(-2px);
+    }
+    .clear-filter-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-weight: 500;
+      font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .clear-filter-btn:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+    }
+
+    /* ===== SEARCH BAR ===== */
+    .search-bar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      background: #f8fafc;
+      padding: 0.8rem 1.2rem;
+      border-radius: 24px;
+      align-items: center;
+      border: 1px solid #eef2ff;
+    }
+    .search-bar input {
+      flex: 2;
+      padding: 0.6rem 1rem;
+      border-radius: 40px;
+      border: 1.5px solid #cbd5e1;
+      background: white;
+      font-size: 0.85rem;
+      min-width: 220px;
+      font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+      transition: all 0.25s ease;
+      outline: none;
+    }
+    .search-bar input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .search-bar .search-info {
+      font-size: 0.7rem;
+      color: #64748b;
+      margin-left: auto;
+    }
+
+    /* ===== STATS ROW ===== */
+    .stats-row {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      padding: 1rem 1.5rem;
+      border-radius: 24px;
+      border: 1px solid #e2e8f0;
+    }
+    .stat-card {
+      background: white;
+      padding: 0.6rem 1.5rem;
+      border-radius: 40px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #eef2ff;
+    }
+    .stat-number {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #1e3a8a;
+      line-height: 1.2;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: #475569;
+      letter-spacing: 0.3px;
+      font-weight: 500;
+    }
+    .stat-card .stat-icon {
+      font-size: 1.2rem;
+      margin-right: 0.3rem;
+    }
+
+    /* ===== TABLE ===== */
+    .report-table-wrapper {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 0.9rem 0.8rem;
+      background: #f1f5f9;
+      color: #1e293b;
+      font-weight: 700;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .data-table td {
+      padding: 0.8rem 0.8rem;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .data-table tr:hover td {
+      background: #f8fafc;
+    }
+    .empty-row td {
+      text-align: center;
+      padding: 3rem !important;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* ===== FOOTNOTE ===== */
+    .report-footnote {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      background: #eef2ff;
+      padding: 0.7rem 1rem;
+      border-radius: 16px;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* ===== SYNC STATUS ===== */
+    .sync-status {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: white;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 1000;
+      border: 1px solid #eef2ff;
+    }
+    .sync-status .status-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .sync-status .status-dot.online { background: #10b981; }
+    .sync-status .status-dot.syncing { background: #f59e0b; }
+    .sync-status .status-dot.offline { background: #ef4444; }
+    .sync-status .sync-btn {
+      background: #f1f5f9;
+      border: none;
+      border-radius: 30px;
+      padding: 2px 10px;
+      cursor: pointer;
+      font-size: 11px;
+      font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    }
+    .sync-status .sync-btn:hover {
+      background: #e2e8f0;
+    }
+
+    /* ===== LOGIN MODAL (from indexGUI.html) ===== */
+    .login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .login-modal.active { display: flex; }
+    .login-modal-content {
+      background: white;
+      border-radius: 2.5rem;
+      max-width: 440px;
+      width: 92%;
+      overflow: hidden;
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.4);
+      animation: fadeUp 0.3s ease;
+    }
+    .login-modal-brand {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+    .login-modal-brand img {
+      width: 110px;
+      height: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      display: inline-block;
+      margin-bottom: 0.6rem;
+    }
+    .login-modal-brand h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.1rem; }
+    .login-modal-brand p { font-size: 0.7rem; opacity: 0.85; }
+    .login-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: 0.2s;
+    }
+    .login-modal-close:hover { opacity: 1; transform: scale(1.1); }
+    .login-modal-body { padding: 1.8rem 1.8rem 1.2rem; }
+    .login-modal-body .input-group { margin-bottom: 1rem; }
+    .login-modal-body .input-group label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #54708f;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.3px;
+    }
+    .login-modal-body .input-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .login-modal-body .input-group input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .login-submit-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 1.2rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .login-submit-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .login-submit-btn:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+    .login-modal-footer {
+      text-align: center;
+      font-size: 0.6rem;
+      color: #94a3b8;
+      padding: 0.4rem 0 1rem;
+      border-top: 1px solid #eef2ff;
+      margin: 0 1.8rem;
+    }
+
+    /* ===== FOOTER (from indexGUI.html) ===== */
+    .footer-new {
+      background: #0a2540;
+      color: #b9d0e7;
+      padding: 2rem 0;
+      margin-top: 3rem;
+      border-top: 1px solid #2d4f6e;
+      width: 100%;
+    }
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .social-icons i {
+      font-size: 1.6rem;
+      margin-right: 0.8rem;
+      color: white;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .social-icons i:hover {
+      transform: translateY(-4px);
+      color: #3b82f6;
+    }
+    .footer-new .logo-image {
+      height: 40px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      margin-bottom: 12px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .app-header { flex-wrap: wrap; gap: 0.5rem; padding: 0.6rem 1rem; }
+      .nav-links { flex: 1 1 100%; justify-content: center; order: 2; }
+      .user-menu-section { order: 3; justify-content: center; width: 100%; }
+      .brand { order: 1; }
+    }
+    @media (max-width: 800px) {
+      .app-header { flex-direction: column; align-items: stretch; padding: 0.6rem 1rem; }
+      .nav-links { flex-wrap: wrap; justify-content: center; order: 2; }
+      .user-menu-section { justify-content: center; margin-top: 0.3rem; order: 3; width: 100%; }
+      .brand { order: 1; justify-content: center; }
+      .hero-innovations { padding: 1.5rem; }
+      .innov-grid { flex-direction: column; }
+      .innov-text p { max-width: 100%; }
+      .innov-image { flex: 1; }
+      .card { padding: 1.5rem; border-radius: 2rem; }
+      .card-header { flex-direction: column; align-items: stretch; }
+      .filter-group { flex-wrap: wrap; }
+      .report-selector, .month-filter { min-width: 100%; }
+      .stats-row { flex-direction: column; gap: 0.8rem; }
+      .stat-card { padding: 0.5rem 1rem; }
+      .stat-number { font-size: 1.5rem; }
+      .brand span { font-size: 0.9rem; }
+      .brand img { height: 34px; }
+    }
+    @media (max-width: 500px) {
+      .container { padding: 0 12px; }
+      .hero-innovations { padding: 1rem; margin: 1rem 0; }
+      .innov-text h1 { font-size: 1.6rem; }
+      .search-bar { flex-direction: column; }
+      .search-bar input { min-width: 100%; }
+      .card { padding: 1rem; margin: 1rem 0; }
+      .report-footnote { font-size: 0.65rem; padding: 0.5rem 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== HEADER (from indexGUI.html) ===== -->
+<div class="app-header">
+  <div class="brand">
+    <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+    <div>
+      <span>DHSUD VI - ELUPDD</span>
+      <small>CLUP & ZO Integrated System</small>
+    </div>
+  </div>
+  <div class="nav-links" id="mainNavContainer">
+    <!-- Dynamically rendered -->
+  </div>
+  <div class="user-menu-section" id="userMenuContainer">
+    <!-- Dynamically rendered -->
+  </div>
+</div>
+
+<main>
+  <div class="container">
+    <!-- ===== HERO (from indexGUI.html) ===== -->
+    <div class="hero-innovations">
+      <div class="innov-grid">
+        <div class="innov-text">
+          <h1>Report Dashboard</h1>
+          <p>Released records from Locational Clearance and Site Zoning Certification. View, filter, and export reports with real-time data from Google Sheets.</p>
+          <div class="platform-badges">
+            <span class="badge-pill"><i class="fas fa-file-alt"></i> Locational Clearance</span>
+            <span class="badge-pill"><i class="fas fa-gavel"></i> Site Zoning</span>
+            <span class="badge-pill"><i class="fas fa-chart-bar"></i> Analytics</span>
+            <span class="badge-pill"><i class="fas fa-file-excel"></i> Export</span>
+          </div>
+        </div>
+        <div class="innov-image">
+          <img src="img/ELUPDD.png" alt="ELUPDD Official Logo" onerror="this.style.display='none'" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MAIN CARD ===== -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-header-icon"><i class="fas fa-file-alt"></i></div>
+          <div>
+            <h2>
+              Report Dashboard
+              <small>Released Records Management</small>
+            </h2>
+          </div>
+        </div>
+        <div class="card-header-badge">
+          <i class="fas fa-circle" style="font-size: 0.4rem; color: #00c896;"></i>
+          <span>Live</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- FILTERS -->
+        <div style="display:flex; flex-wrap:wrap; gap:0.8rem; align-items:center; margin-bottom:1.5rem;">
+          <select id="reportTypeSelect" class="report-selector" onchange="switchReportType()">
+            <option value="locational">📍 Locational Clearance (Released)</option>
+            <option value="zoning">🗺️ Site Zoning Certification (Released)</option>
+          </select>
+          <select id="monthFilter" class="month-filter" onchange="filterReportTable()">
+            <option value="all">📅 All Months</option>
+          </select>
+          <button class="clear-filter-btn" onclick="clearMonthFilter()"><i class="fas fa-times"></i> Clear Month</button>
+          <button class="btn btn-success" onclick="exportCurrentReportToExcel()"><i class="fas fa-file-excel"></i> Export Excel</button>
+          <button class="btn btn-primary" onclick="fetchLiveData()"><i class="fas fa-sync-alt"></i> Sync</button>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="search-bar">
+          <input type="text" id="reportSearchInput" placeholder="🔍 Search by Control No., Applicant, Location..." onkeyup="filterReportTable()">
+          <span class="search-info"><i class="fas fa-check-circle" style="color:#10b981;"></i> Released records only</span>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row" id="statsPanel">
+          <div class="stat-card">
+            <div class="stat-number" id="totalCount">-</div>
+            <div class="stat-label"><i class="fas fa-database stat-icon"></i> Total Released</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="monthCount">-</div>
+            <div class="stat-label"><i class="fas fa-filter stat-icon"></i> Filtered Records</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="avgDays">-</div>
+            <div class="stat-label"><i class="fas fa-clock stat-icon"></i> Avg. Processing Days</div>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="report-table-wrapper">
+          <table class="data-table" id="reportTable">
+            <thead id="tableHeader"><tr><th colspan="12">Loading data from Google Sheets...</th></tr></thead>
+            <tbody id="tableBody"><tr class="empty-row"><td colspan="12">Please wait, fetching released records...</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- FOOTNOTE -->
+        <div class="report-footnote">
+          <i class="fas fa-check-circle" style="color:#10b981;"></i>
+          Report includes ONLY records with status = <strong>"Released"</strong> from live Google Sheets endpoints.
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== FOOTER (from indexGUI.html) ===== -->
+<footer class="footer-new">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img src="img/DHSUD_LOGO.png" alt="logo" class="logo-image" /><br />
+        <strong>DHSUD Region VI</strong><br />ELUPDD – CLUP & ZO Platform<br />Geospatial Innovation for Resilience
+      </div>
+      <div>
+        <strong>Our Social Networks</strong><br />Follow us for updates<br />
+        <div class="social-icons">
+          <a href="https://web.facebook.com/DHSUDR6" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook"></i></a>
+          <i class="fab fa-instagram"></i><i class="fab fa-twitter"></i>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2rem; border-top:1px solid #2d4f6e; padding-top:1rem">© 2026 DHSUD VI — ELUPDD</div>
+  </div>
+</footer>
+
+<!-- ===== SYNC STATUS ===== -->
+<div class="sync-status" id="syncStatus">
+  <span class="status-dot online" id="statusDot"></span>
+  <span id="statusText">Connected</span>
+  <button class="sync-btn" onclick="fetchLiveData()"><i class="fas fa-sync-alt"></i></button>
+</div>
+
+<!-- ===== LOGIN MODAL (from indexGUI.html) ===== -->
+<div id="loginModal" class="login-modal">
+  <div class="login-modal-content">
+    <div class="login-modal-brand">
+      <button class="login-modal-close" onclick="closeLoginModal()">&times;</button>
+      <img src="img/DHSUD_LOGO.png" alt="DHSUD Logo" onerror="this.style.display='none'" />
+      <h3>DHSUD Region VI</h3>
+      <p>ELUPDD · CLUP & ZO Platform</p>
+    </div>
+    <div class="login-modal-body">
+      <form id="modalLoginForm">
+        <div class="input-group">
+          <label><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" id="modalLoginEmail" placeholder="name@dhsud.gov.ph" required />
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="modalLoginPassword" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="login-submit-btn" id="loginModalBtn">→ Sign In</button>
+      </form>
+    </div>
+    <div class="login-modal-footer">🔐 Role-Based Access: Admin | Staff/Officer</div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// TOAST NOTIFICATION SYSTEM (from indexGUI.html)
+// ============================================
+function showToast(title, message, type = 'info', duration = 4000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  const icons = {
+    success: 'fa-check-circle',
+    error: 'fa-times-circle',
+    warning: 'fa-exclamation-triangle',
+    info: 'fa-info-circle'
+  };
+  
+  toast.innerHTML = `
+    <div class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+  `;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+  
+  return toast;
+}
+
+// ============================================
+// CONFIGURATION
+// ============================================
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCYiLHesLAvoh6wV_gTQyTGYBwRqiBwDpiKiLsYHOntGVF2gW5NjWUS50YzoHaJmk/exec";
+const GOOGLE_SCRIPT_URL_DATA = "https://script.google.com/macros/s/AKfycbwo4bJ6qkDy7HkB4IMRu4y1E0JKHgSF9IZFilJbjeNNUdYkIfg-iv7AuZB3p6vd9Q/exec";
+let currentUser = null;
+
+// Data stores
+let locationalReleased = [];
+let zoningReleased = [];
+let currentReportType = "locational";
+let filteredData = [];
+let currentMonthFilter = "all";
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function escapeHtml(s) { if (!s) return ""; return String(s).replace(/[&<>]/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;" })[m]); }
+function encodePassword(p) { return btoa(p); }
+
+function formatDateShort(d) {
+  if (!d) return "";
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return d;
+  return dt.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
+
+function getMonthYear(d) {
+  if (!d) return "";
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return "";
+  return dt.toLocaleDateString("en-US", { year: "numeric", month: "long" });
+}
+
+function calcProcessDays(received, issued) {
+  if (!received || !issued) return null;
+  const s = new Date(received), e = new Date(issued);
+  if (isNaN(s.getTime()) || isNaN(e.getTime())) return null;
+  const diff = Math.abs(e - s);
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function getTimeliness(d) {
+  return d === null ? "—" : (d <= 30 ? "On Time" : "Delayed");
+}
+
+// ============================================
+// SESSION MANAGEMENT (from indexGUI.html)
+// ============================================
+function checkSession() {
+  const raw = localStorage.getItem("dhsud_session");
+  if (raw) {
+    try {
+      const s = JSON.parse(raw);
+      const diff = (new Date() - new Date(s.loggedInAt)) / (1000 * 60 * 60);
+      if (diff < 12 && s.email) {
+        currentUser = s;
+        return true;
+      } else localStorage.removeItem("dhsud_session");
+    } catch(e) { localStorage.removeItem("dhsud_session"); }
+  }
+  currentUser = null;
+  return false;
+}
+
+function getUserInitials(n) { if (!n) return "U"; let p = n.split(" "); if (p.length >= 2) return (p[0][0] + p[1][0]).toUpperCase(); return n.substring(0,2).toUpperCase(); }
+function getRoleLabel(r) { if (r === "admin") return "👑 Admin"; if (r === "encoder" || r === "staff") return "📋 Staff/Officer"; return "👁️ Viewer"; }
+function getRoleClass(r) { if (r === "admin") return "admin"; if (r === "encoder" || r === "staff") return "staff"; return "viewer"; }
+
+// ============================================
+// RENDER NAVIGATION & USER MENU (from indexGUI.html)
+// ============================================
+function renderMainNavigation() {
+  const container = document.getElementById("mainNavContainer");
+  if (!container) return;
+  let navHtml = `<a href="index.html"><i class="fas fa-home"></i> Home</a>`;
+  if (currentUser) {
+    navHtml += `
+      <div class="dropdown">
+        <button class="dropbtn">Certification</button>
+        <div class="dropdown-content">
+          <a href="lc.html">Locational Clearance</a>
+          <a href="SZC.html">Site Zoning Certification</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn">Land Use Plans</button>
+        <div class="dropdown-content">
+          <div class="dropdown-submenu">
+            <button class="submenu-trigger">CLUP & ZO <span class="arrow-right">▸</span></button>
+            <div class="submenu-content">
+              <a href="inventory.html">Inventory</a>
+              <a href="status.html">Status</a>
+            </div>
+          </div>
+          <a href="status.html">PDPFP</a>
+        </div>
+      </div>
+      <a href="Techsamp.html"><i class="fas fa-headset"></i> Technical Assistance</a>
+      <a href="lgu-info.html"><i class="fas fa-city"></i> LGU Information</a>
+      <a href="report.html" class="active"><i class="fas fa-chart-pie"></i> Reports</a>
+      <a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a>
+      <a href="issuance.html"><i class="fas fa-file-alt"></i> Issuances</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+    `;
+  } else {
+    navHtml += `<a href="index.html#about">About</a><a href="index.html#contact">Contact</a>`;
+  }
+  container.innerHTML = navHtml;
+  setTimeout(() => {
+    document.querySelectorAll(".dropdown-submenu .submenu-trigger").forEach((trigger) => {
+      trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const submenu = trigger.closest(".dropdown-submenu");
+        if (submenu) submenu.classList.toggle("open");
+      });
+    });
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".dropdown-submenu")) {
+        document.querySelectorAll(".dropdown-submenu.open").forEach((s) => s.classList.remove("open"));
+      }
+    });
+  }, 10);
+}
+
+function renderUserMenu() {
+  const container = document.getElementById("userMenuContainer");
+  if (!container) return;
+  if (currentUser) {
+    const initials = getUserInitials(currentUser.fullName);
+    const firstName = currentUser.fullName?.split(" ")[0] || "User";
+    const roleLabel = getRoleLabel(currentUser.role);
+    const roleClass = getRoleClass(currentUser.role);
+    container.innerHTML = `
+      <div class="user-menu" id="userMenuDropdown" style="position:relative;">
+        <div class="user-avatar">${initials}</div>
+        <span class="user-name">${escapeHtml(firstName)}</span>
+        <span class="role-badge-header ${roleClass}">${roleLabel}</span>
+        <span style="font-size:0.6rem;">▼</span>
+        <div class="user-dropdown-menu">
+          <div class="user-dropdown-item">👤 ${escapeHtml(currentUser.email)}</div>
+          <div class="user-dropdown-item">🏢 ${escapeHtml(currentUser.office || "ELUPDD")}</div>
+          ${currentUser.role === "admin" ? `<div class="user-dropdown-item" id="adminConsoleLink">⚙️ Manage Users</div>` : ""}
+          <div class="user-dropdown-item" id="logoutDropdownBtn" style="color:#dc2626;">🚪 Sign Out</div>
+        </div>
+      </div>
+    `;
+    const userDiv = document.getElementById("userMenuDropdown");
+    if (userDiv) {
+      userDiv.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const menu = userDiv.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = menu.style.display === "block" ? "none" : "block";
+      });
+      document.addEventListener("click", () => {
+        const menu = userDiv?.querySelector(".user-dropdown-menu");
+        if (menu) menu.style.display = "none";
+      });
+    }
+    if (currentUser.role === "admin") {
+      const adminBtn = document.getElementById("adminConsoleLink");
+      if (adminBtn) adminBtn.addEventListener("click", () => (window.location.href = "admin.html"));
+    }
+    const logoutBtn = document.getElementById("logoutDropdownBtn");
+    if (logoutBtn) logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("dhsud_session");
+      showToast("Logged Out", "You have been logged out successfully.", "info");
+      setTimeout(() => { window.location.href = "report.html"; }, 700);
+    });
+  } else {
+    container.innerHTML = `<div class="login-prompt" onclick="openLoginModal()"><i class="fas fa-sign-in-alt"></i> Sign In</div>`;
+  }
+}
+
+// ============================================
+// LOGIN MODAL (from indexGUI.html)
+// ============================================
+function openLoginModal() {
+  document.getElementById("loginModal").classList.add("active");
+}
+function closeLoginModal() {
+  document.getElementById("loginModal").classList.remove("active");
+}
+async function handleModalLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById("modalLoginEmail").value.trim().toLowerCase();
+  const password = document.getElementById("modalLoginPassword").value;
+  const btn = document.getElementById("loginModalBtn");
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Authenticating...";
+  try {
+    const resp = await fetch(`${GOOGLE_SCRIPT_URL}?action=get&data_type=users&_=${Date.now()}`);
+    const users = await resp.json();
+    const user = users.find((u) => u.email?.toLowerCase() === email);
+    if (!user) { showToast("Authentication Failed", "Account not found.", "error"); btn.innerHTML = originalText; btn.disabled = false; return false; }
+    if (user.password === encodePassword(password)) {
+      const session = { userId: user.id, email: user.email, fullName: user.fullName, office: user.office || "ELUPDD", role: user.role, loggedInAt: new Date().toISOString() };
+      localStorage.setItem("dhsud_session", JSON.stringify(session));
+      showToast("Welcome", `Welcome ${user.fullName?.split(" ")[0] || ""}!`, "success");
+      closeLoginModal();
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showToast("Authentication Failed", "Invalid password.", "error");
+    }
+  } catch (error) {
+    showToast("Connection Error", "Please try again.", "error");
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+  return false;
+}
+
+// ============================================
+// DATA FETCHING FUNCTIONS
+// ============================================
+
+// Fetch Locational Clearance records (released only)
+async function fetchLocationalReleased() {
+  try {
+    const url = `${GOOGLE_SCRIPT_URL_DATA}?action=get&data_type=locational&_=${Date.now()}`;
+    const response = await fetch(url, { mode: "cors" });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    let records = [];
+    if (Array.isArray(data)) {
+      records = data;
+    } else if (data && data.success === true && Array.isArray(data.data)) {
+      records = data.data;
+    } else if (data && data.data && Array.isArray(data.data)) {
+      records = data.data;
+    } else if (data && typeof data === 'object') {
+      for (let key in data) {
+        if (Array.isArray(data[key]) && data[key].length > 0) {
+          records = data[key];
+          break;
+        }
+      }
+    }
+    
+    locationalReleased = records.filter(rec => {
+      const status = rec.status ? String(rec.status).toLowerCase().trim() : "";
+      return status === "released";
+    });
+    
+  } catch(e) {
+    console.error("Error fetching locational data:", e);
+    locationalReleased = [];
+    throw e;
+  }
+}
+
+// Fetch Site Zoning Certification records (released only)
+async function fetchZoningReleased() {
+  try {
+    const url = `${GOOGLE_SCRIPT_URL_DATA}?action=get&data_type=zoning&_=${Date.now()}`;
+    const response = await fetch(url, { mode: "cors" });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    let records = [];
+    if (Array.isArray(data)) {
+      records = data;
+    } else if (data && data.success === true && Array.isArray(data.data)) {
+      records = data.data;
+    } else if (data && data.data && Array.isArray(data.data)) {
+      records = data.data;
+    } else if (data && typeof data === 'object') {
+      for (let key in data) {
+        if (Array.isArray(data[key]) && data[key].length > 0) {
+          records = data[key];
+          break;
+        }
+      }
+    }
+    
+    zoningReleased = records.filter(rec => {
+      const status = rec.status ? String(rec.status).toLowerCase().trim() : "";
+      return status === "released";
+    });
+    
+  } catch(e) {
+    console.error("Error fetching zoning data:", e);
+    zoningReleased = [];
+    throw e;
+  }
+}
+
+// Main fetch function
+async function fetchLiveData() {
+  const dot = document.getElementById("statusDot");
+  const txt = document.getElementById("statusText");
+  
+  if (dot) { dot.className = "status-dot syncing"; txt.innerText = "Syncing..."; }
+  
+  try {
+    await Promise.all([fetchLocationalReleased(), fetchZoningReleased()]);
+    
+    populateMonthFilter();
+    renderReportTable();
+    
+    if (dot) { dot.className = "status-dot online"; txt.innerText = "Connected"; }
+    showToast("Sync Complete", `Loaded ${locationalReleased.length + zoningReleased.length} released records.`, "success");
+    
+  } catch(e) {
+    console.error("Sync error:", e);
+    if (dot) { dot.className = "status-dot offline"; txt.innerText = "Error"; }
+    showToast("Sync Failed", e.message, "error");
+    
+    const tbody = document.getElementById("tableBody");
+    if (tbody) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="12">❌ Failed to load data: ${escapeHtml(e.message)}<br><br><button onclick="fetchLiveData()" style="padding:8px 16px; background:#2563eb; color:white; border:none; border-radius:8px; cursor:pointer; font-family:inherit;"><i class="fas fa-sync-alt"></i> Retry</button></td></tr>`;
+    }
+  }
+}
+
+// ============================================
+// REPORT TABLE RENDERING FUNCTIONS
+// ============================================
+
+const LOCATIONAL_COLS = ["Application No.", "Decision No.", "Requesting Party", "Date Issued", "Report Month", "Owner/Proponents", "Location", "Total Area", "No. of Days", "On Time / Delayed", "Amount Paid", "O.R. No."];
+const ZONING_COLS = ["Certification No.", "Type", "Requesting Party", "Date Issued", "Report Month", "Owner/Proponents", "Location", "No. of Parcels", "Total Area (ha)", "No. of Days", "On Time / Delayed", "Amount Paid", "O.R. No."];
+
+function mapLocationalToRow(r) {
+  const days = calcProcessDays(r.dateReceipt, r.dateIssue);
+  const timeliness = getTimeliness(days);
+  const reportMonth = getMonthYear(r.dateIssue);
+  const owner = (r.applicant || "") + (r.corporation ? ` (${r.corporation})` : "");
+  
+  let areaLocationStr = "";
+  if (r.areaLocation !== undefined && r.areaLocation !== null) {
+    areaLocationStr = String(r.areaLocation);
+  }
+  
+  let area = "";
+  if (areaLocationStr) {
+    const match = areaLocationStr.match(/\d+(?:\.\d+)?/g);
+    area = match && match.length > 0 ? match[0] + " sqm" : areaLocationStr;
+  }
+  
+  return {
+    "Application No.": r.applicationNo ? String(r.applicationNo) : "",
+    "Decision No.": r.decisionNo ? String(r.decisionNo) : "",
+    "Requesting Party": r.applicant ? String(r.applicant) : "",
+    "Date Issued": formatDateShort(r.dateIssue),
+    "Report Month": reportMonth,
+    "Owner/Proponents": owner,
+    "Location": areaLocationStr,
+    "Total Area": area,
+    "No. of Days": days !== null ? days : "",
+    "On Time / Delayed": timeliness,
+    "Amount Paid": r.amountPaid ? `₱ ${r.amountPaid}` : "",
+    "O.R. No.": r.orNo ? String(r.orNo) : ""
+  };
+}
+
+function mapZoningToRow(r) {
+  const days = calcProcessDays(r.dateReceived, r.dateIssued);
+  const timeliness = getTimeliness(days);
+  const reportMonth = getMonthYear(r.dateIssued);
+  
+  let owners = [];
+  if (r.landHoldings && Array.isArray(r.landHoldings)) {
+    owners = r.landHoldings.map(h => h.registeredOwner).filter(Boolean);
+  }
+  const ownerProp = owners.length ? owners.join(", ") : (r.requestedBy || "");
+  
+  let totalArea = "";
+  if (r.totalArea) {
+    if (typeof r.totalArea === 'string') {
+      const num = parseFloat(r.totalArea);
+      totalArea = !isNaN(num) ? num.toFixed(4) : r.totalArea;
+    } else if (typeof r.totalArea === 'number') {
+      totalArea = r.totalArea.toFixed(4);
+    } else {
+      totalArea = String(r.totalArea);
+    }
+  }
+  
+  const parcels = r.parcels || (r.landHoldings?.length || "1");
+  
+  return {
+    "Certification No.": r.certificationNo || "",
+    "Type": r.certificationIssued || "Site Zoning Certification",
+    "Requesting Party": r.requestedBy || "",
+    "Date Issued": formatDateShort(r.dateIssued),
+    "Report Month": reportMonth,
+    "Owner/Proponents": ownerProp,
+    "Location": (typeof r.location === 'string' ? r.location : (r.location ? String(r.location) : "")) || "",
+    "No. of Parcels": parcels,
+    "Total Area (ha)": totalArea,
+    "No. of Days": days !== null ? days : "",
+    "On Time / Delayed": timeliness,
+    "Amount Paid": r.amountPaid ? `₱ ${r.amountPaid}` : "",
+    "O.R. No.": r.orNo || ""
+  };
+}
+
+function getCurrentRecords() {
+  if (currentReportType === "locational") {
+    return locationalReleased;
+  } else if (currentReportType === "zoning") {
+    return zoningReleased;
+  }
+  return [];
+}
+
+function populateMonthFilter() {
+  const records = getCurrentRecords();
+  const months = new Set();
+  
+  records.forEach(rec => {
+    const dateIssued = rec.dateIssue || rec.dateIssued;
+    const monthKey = getMonthYear(dateIssued);
+    if (monthKey) months.add(monthKey);
+  });
+  
+  const sorted = Array.from(months).sort((a, b) => {
+    const dateA = new Date(a);
+    const dateB = new Date(b);
+    if (!isNaN(dateA) && !isNaN(dateB)) {
+      return dateB - dateA;
+    }
+    return a.localeCompare(b);
+  });
+  
+  const sel = document.getElementById("monthFilter");
+  const cur = sel.value;
+  sel.innerHTML = '<option value="all">📅 All Months</option>';
+  sorted.forEach(month => {
+    const opt = document.createElement("option");
+    opt.value = month;
+    opt.textContent = month;
+    sel.appendChild(opt);
+  });
+  
+  if (cur !== "all" && sorted.includes(cur)) {
+    sel.value = cur;
+  } else {
+    sel.value = "all";
+    currentMonthFilter = "all";
+  }
+}
+
+function clearMonthFilter() {
+  document.getElementById("monthFilter").value = "all";
+  currentMonthFilter = "all";
+  filterReportTable();
+}
+
+function filterReportTable() {
+  currentMonthFilter = document.getElementById("monthFilter").value;
+  renderReportTable();
+}
+
+function renderReportTable() {
+  let records = getCurrentRecords();
+  const search = document.getElementById("reportSearchInput")?.value.toLowerCase() || "";
+  const monthFilter = currentMonthFilter;
+  
+  let filtered = records;
+  if (search) {
+    filtered = filtered.filter(rec => {
+      const controlNo = (rec.applicationNo || rec.certificationNo || "").toLowerCase();
+      const requestingParty = (rec.applicant || rec.requestedBy || "").toLowerCase();
+      const location = (rec.areaLocation || rec.location || "").toLowerCase();
+      return controlNo.includes(search) || 
+             requestingParty.includes(search) || 
+             location.includes(search);
+    });
+  }
+  
+  if (monthFilter !== "all") {
+    filtered = filtered.filter(rec => {
+      const dateIssued = rec.dateIssue || rec.dateIssued;
+      return getMonthYear(dateIssued) === monthFilter;
+    });
+  }
+  
+  filteredData = filtered;
+  
+  const totalReleased = records.length;
+  const filteredCount = filteredData.length;
+  
+  let totalDays = 0, daysCount = 0;
+  filteredData.forEach(rec => {
+    const received = rec.dateReceipt || rec.dateReceived;
+    const issued = rec.dateIssue || rec.dateIssued;
+    const days = calcProcessDays(received, issued);
+    if (days !== null && !isNaN(days) && days > 0) {
+      totalDays += days;
+      daysCount++;
+    }
+  });
+  const avgDays = daysCount > 0 ? (totalDays / daysCount).toFixed(1) : "0";
+  
+  document.getElementById("totalCount").innerText = totalReleased;
+  document.getElementById("monthCount").innerText = filteredCount;
+  document.getElementById("avgDays").innerText = avgDays;
+  
+  let cols = currentReportType === "locational" ? LOCATIONAL_COLS : ZONING_COLS;
+  
+  const thead = document.getElementById("tableHeader");
+  if (thead) {
+    thead.innerHTML = `<tr>${cols.map(c => `<th>${c}</th>`).join("")}</tr>`;
+  }
+  
+  const tbody = document.getElementById("tableBody");
+  if (!tbody) return;
+  
+  if (filteredData.length === 0) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="${cols.length}">📭 No released records found for the selected filter.</td></tr>`;
+    return;
+  }
+  
+  let rows = "";
+  filteredData.forEach(rec => {
+    let rowCells = [];
+    if (currentReportType === "locational") {
+      const row = mapLocationalToRow(rec);
+      rowCells = LOCATIONAL_COLS.map(col => row[col] !== undefined ? row[col] : "");
+    } else {
+      const row = mapZoningToRow(rec);
+      rowCells = ZONING_COLS.map(col => row[col] !== undefined ? row[col] : "");
+    }
+    rows += `<tr>${rowCells.map(c => `<td>${escapeHtml(String(c))}</td>`).join("")}</tr>`;
+  });
+  
+  tbody.innerHTML = rows;
+}
+
+function switchReportType() {
+  const sel = document.getElementById("reportTypeSelect");
+  currentReportType = sel.value;
+  currentMonthFilter = "all";
+  document.getElementById("monthFilter").value = "all";
+  populateMonthFilter();
+  renderReportTable();
+}
+
+// ============================================
+// EXPORT FUNCTIONS
+// ============================================
+
+function exportCurrentReportToExcel() {
+  let records = filteredData.length > 0 ? filteredData : getCurrentRecords();
+  const search = document.getElementById("reportSearchInput")?.value.toLowerCase() || "";
+  const monthFilter = currentMonthFilter;
+  
+  let exportRecords = [...records];
+  
+  if (search) {
+    exportRecords = exportRecords.filter(rec => {
+      const controlNo = (rec.applicationNo || rec.certificationNo || "").toLowerCase();
+      const requestingParty = (rec.applicant || rec.requestedBy || "").toLowerCase();
+      const location = (rec.areaLocation || rec.location || "").toLowerCase();
+      return controlNo.includes(search) || 
+             requestingParty.includes(search) || 
+             location.includes(search);
+    });
+  }
+  
+  if (monthFilter !== "all") {
+    exportRecords = exportRecords.filter(rec => {
+      const dateIssued = rec.dateIssue || rec.dateIssued;
+      return getMonthYear(dateIssued) === monthFilter;
+    });
+  }
+  
+  if (exportRecords.length === 0) {
+    showToast("No Records", "No records to export.", "warning");
+    return;
+  }
+  
+  let sheetData = [];
+  let cols = [];
+  
+  if (currentReportType === "locational") {
+    cols = LOCATIONAL_COLS;
+    sheetData = exportRecords.map(rec => {
+      const row = mapLocationalToRow(rec);
+      const out = {};
+      cols.forEach(c => out[c] = row[c] !== undefined ? row[c] : "");
+      return out;
+    });
+  } else {
+    cols = ZONING_COLS;
+    sheetData = exportRecords.map(rec => {
+      const row = mapZoningToRow(rec);
+      const out = {};
+      cols.forEach(c => out[c] = row[c] !== undefined ? row[c] : "");
+      return out;
+    });
+  }
+  
+  const ws = XLSX.utils.json_to_sheet(sheetData);
+  const wb = XLSX.utils.book_new();
+  const name = currentReportType === "locational" ? "Locational_Clearance_Released" : "Site_Zoning_Released";
+  XLSX.utils.book_append_sheet(wb, ws, name);
+  XLSX.writeFile(wb, `${name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast("Exported", `Exported ${exportRecords.length} records to Excel`, "success");
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+function init() {
+  checkSession();
+  renderMainNavigation();
+  renderUserMenu();
+  
+  document.getElementById("tableHeader").innerHTML = `<tr><th colspan="12">Loading released records...</th></tr>`;
+  document.getElementById("reportTypeSelect").value = "locational";
+  currentReportType = "locational";
+  
+  fetchLiveData();
+  
+  setInterval(() => {
+    fetchLiveData().catch(e => console.warn("Auto-refresh error:", e));
+  }, 60000);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  const form = document.getElementById("modalLoginForm");
+  if (form) form.addEventListener("submit", handleModalLogin);
+  init();
+});
+
+// Expose functions globally
+window.switchReportType = switchReportType;
+window.filterReportTable = filterReportTable;
+window.clearMonthFilter = clearMonthFilter;
+window.exportCurrentReportToExcel = exportCurrentReportToExcel;
+window.fetchLiveData = fetchLiveData;
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
+window.showToast = showToast;
+</script>
+</body>
+</html>
